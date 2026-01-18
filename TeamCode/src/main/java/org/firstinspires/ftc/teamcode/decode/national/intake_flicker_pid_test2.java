@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -49,7 +50,9 @@ public class intake_flicker_pid_test2 extends LinearOpMode {
     public static double score1 = 0.66;
     public static double score2 = 0.33;
     public static double score3 = 0.475;
-
+    public static double nextTime = 0.4;
+    public static double homeTime = 0.25;
+    DcMotorEx lift;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -63,6 +66,10 @@ public class intake_flicker_pid_test2 extends LinearOpMode {
         shooterBottom.setDirection(DcMotorEx.Direction.REVERSE);
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        lift = hardwareMap.get(DcMotorEx.class, "lift");
+        lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        lift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
         CycleGamepad cyclegamepad1 = new CycleGamepad(gamepad1);
@@ -79,7 +86,7 @@ public class intake_flicker_pid_test2 extends LinearOpMode {
             dashboardTelemetry.update();
 
             if (gamepad1.y){
-                if (nextTimer.seconds() >= 0.4){
+                if (nextTimer.seconds() >= nextTime){
                     flickerTimer.reset();
                     nextTimer.reset();
                     flickerCount += 1;
@@ -88,19 +95,19 @@ public class intake_flicker_pid_test2 extends LinearOpMode {
                     flickerCount = 1;
                 }
                 if (flickerCount == 1){
-                    if (flickerTimer.seconds() <= 0.25){
+                    if (flickerTimer.seconds() <= homeTime){
                         flicker1.setPosition(score1);
                     }
                     else flicker1.setPosition(home1);
                 }
                 else if (flickerCount == 2){
-                    if (flickerTimer.seconds() <= 0.25){
+                    if (flickerTimer.seconds() <= homeTime){
                         flicker2.setPosition(score2);
                     }
                     else flicker2.setPosition(home2);
                 }
                 else if (flickerCount == 3){
-                    if (flickerTimer.seconds() <= 0.25){
+                    if (flickerTimer.seconds() <= homeTime){
                         flicker3.setPosition(score3);
                     }
                     else flicker3.setPosition(home3);
@@ -135,7 +142,7 @@ public class intake_flicker_pid_test2 extends LinearOpMode {
 
                 } else ball3_button_pressed = false;
 
-
+                updateBooleans();
             }
             telemetry.addData("nexttimer:", nextTimer.seconds());
             telemetry.update();
@@ -152,7 +159,13 @@ public class intake_flicker_pid_test2 extends LinearOpMode {
 
 
 
-
+            if (gamepad2.dpad_up){
+                lift.setPower(1);
+            }
+            else if (gamepad2.dpad_down){
+                lift.setPower(-1);
+            }
+            else lift.setPower(0);
 
             if (gamepad1.dpad_up){
                 intake.setPower(1);
@@ -161,8 +174,6 @@ public class intake_flicker_pid_test2 extends LinearOpMode {
                 intake.setPower(-1);
             }
             else intake.setPower(0);
-
-            updateBooleans();
 
         }
     }

@@ -120,21 +120,21 @@ public class flicker_pid_test1 extends LinearOpMode {
 
     public void updateBooleans() {
         if (ball1_released) {
-            flicker1.setPosition(0.95);
+            flicker1.setPosition(0.96);
         } else {
-            flicker1.setPosition(0.65);// lower position
+            flicker1.setPosition(0.66);// lower position
         }
 
         if (ball2_released) {
-            flicker2.setPosition(0.55);
+            flicker2.setPosition(0.03);
         } else {
-            flicker2.setPosition(0.85);// lower position
+            flicker2.setPosition(0.33);// lower position
         }
 
         if (ball3_released) {
-            flicker3.setPosition(0.46);
+            flicker3.setPosition(0.175);
         } else {
-            flicker3.setPosition(0.76);// lower position
+            flicker3.setPosition(0.475);// lower position
         }
 
     }
