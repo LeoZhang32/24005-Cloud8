@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 
 import java.util.Locale;
@@ -26,13 +27,15 @@ public class turretpidtest extends LinearOpMode {
     public static double Kd = 0.0056;
     public static double Kf = 0;
     public static double minimum = 0.3; // tune this
-    public static double maximum = 0.95; // tune this
+    public static double maximum = 1; // tune this
 
     private double lastError = 0;
     ElapsedTime PIDtimer = new ElapsedTime();
     public static double targetPosition = 190;
     DcMotorEx turretEncoder;
     CRServo turret;
+    double lastDerivative = 0;
+    double lastDt = 0;
 
     public double toDegrees(double currentHeading) {
         return currentHeading*180/Math.PI;
@@ -42,19 +45,22 @@ public class turretpidtest extends LinearOpMode {
     }
     public double PIDControl(double reference, double state) {
         double error = reference - state;
-        integralSum += error * PIDtimer.seconds();
+        double dt = PIDtimer.seconds();
+        if (dt < 1e-4) dt = 1e-4;
+        integralSum += error * dt;
 
-        double derivative = (error - lastError) / PIDtimer.seconds();
+        double derivative = (error - lastError) / dt;
+        lastDerivative = derivative;
+        lastDt = dt;
         lastError = error;
 
         PIDtimer.reset();
 
         double output = (error * Kp) + (derivative * Kd) + (integralSum * Ki) + (reference * Kf);
-        if (Math.abs(output) < minimum) {
+        if (Math.abs(output) < minimum || Double.isNaN(output) || Double.isInfinite(output)) {
             output = 0;
         }
-        if (output > maximum) output = 1;
-        if (output < -maximum)output = -1;
+        output = Range.clip(output, -maximum, maximum);
         return output;
     }
 
@@ -69,6 +75,7 @@ public class turretpidtest extends LinearOpMode {
         turretEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret = hardwareMap.get(CRServo.class, "turret");
         double currentPos = 0;
+        PIDtimer.reset();
         waitForStart();
         while (opModeIsActive() && !isStopRequested()){
             pinpoint.update();
@@ -81,7 +88,7 @@ public class turretpidtest extends LinearOpMode {
             double dx = Math.abs(goal.x - pos.position.x);
             double dy = Math.abs(goal.y - pos.position.y);
 
-            double robotGoalAngle = Math.toDegrees(Math.atan(dx/dy));
+            double robotGoalAngle = Math.toDegrees(Math.atan2(dx,dy));
 //            double robotGoalAngle = toDegrees(Math.acos((63-pos.position.y)/distance));
             double desiredAngle = 165 - (robotGoalAngle+toDegrees(-pos.heading.toDouble()));
             if (desiredAngle < 0) {
@@ -92,11 +99,12 @@ public class turretpidtest extends LinearOpMode {
             telemetry.addData("target", desiredAngle);
             telemetry.addData("distance", distance);
             telemetry.addData("robot goal angle", robotGoalAngle);
-            if (gamepad1.a)turretEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            else turretEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             currentPos = -(double) turretEncoder.getCurrentPosition() /(8192*4) * 360;
             telemetry.addData("encoder pos (degrees)", currentPos);
-            double power = PIDControl(desiredAngle % 360, currentPos);
+            double power = PIDControl(desiredAngle, currentPos);
+            telemetry.addData("PID timer", lastDt);
+            telemetry.addData("error", lastError);
+            telemetry.addData("derivative", lastDerivative);
             telemetry.addData("power", power);
             if (gamepad1.b)turret.setPower(power);
             else turret.setPower(0);

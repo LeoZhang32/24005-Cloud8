@@ -151,7 +151,7 @@ public class teleop_test1 extends LinearOpMode {
         cSensors.init(hardwareMap);
         light1 = hardwareMap.get(Servo.class, "light1");
         light2 = hardwareMap.get(Servo.class, "light2");
-
+        PIDtimer.reset();
         waitForStart();
         if (isStopRequested()) return;
         while (!isStopRequested() && opModeIsActive()) {
@@ -210,34 +210,35 @@ public class teleop_test1 extends LinearOpMode {
             dashboardTelemetry.addData("velocity", shooterTop.getVelocity(AngleUnit.DEGREES));
             dashboardTelemetry.addData("reference", targetVelocity);
             dashboardTelemetry.update();
-            if (gamepad2.a && shooterTop.getVelocity(AngleUnit.DEGREES) > 80){
-                //if haven't checked for artifact this press, check
-                if (!capacityChecked){
-                    //check if each spot has artifact
-                    detect1 = cSensors.checkDetected1();
-                    detect2 = cSensors.checkDetected2();
-                    detect3 = cSensors.checkDetected3();
-                    //add detected spots to array to be shot
-                    if (detect1){
-                        flickOrder.add(new Flicker(flicker1, home1, score1));
-                    }
-                    if (detect2){
-                        flickOrder.add(new Flicker(flicker2, home2, score2));
-                    }
-                    if (detect3){
-                        flickOrder.add(new Flicker(flicker3, home3, score3));
-                    }
-                    //we have detected for artifacts! for next loops in press, don't check again
-                    capacityChecked = true;
-                    shootingFinished = false;
+
+            //if haven't checked for artifact, check
+            if (!capacityChecked){
+                //check if each spot has artifact
+                detect1 = cSensors.checkDetected1();
+                detect2 = cSensors.checkDetected2();
+                detect3 = cSensors.checkDetected3();
+                //add detected spots to array to be shot
+                if (detect1){
+                    flickOrder.add(new Flicker(flicker1, home1, score1));
                 }
+                if (detect2){
+                    flickOrder.add(new Flicker(flicker2, home2, score2));
+                }
+                if (detect3){
+                    flickOrder.add(new Flicker(flicker3, home3, score3));
+                }
+                //we have detected for artifacts! for next loops in press, don't check again
+                capacityChecked = true;
+                shootingFinished = false;
+            }
+            if (gamepad2.a && shooterTop.getVelocity(AngleUnit.DEGREES) > 80){
                 if (!flickOrder.isEmpty() && !shootingFinished){
                     //actually move the flickers.
                     if (flickerTimer.seconds() <= homeTime){
-                        //if the PIDtimer is before time to move back, it's in score position.
+                        //if the timer is before time to move back, it's in score position.
                         flickOrder.get(flickCounter - 1).goScore();
                     }
-                    //if PIDtimer is after time to move back, move back.
+                    //if timer is after time to move back, move back.
                     else flickOrder.get(flickCounter - 1).goHome();
 
                     //if we reach the time to cycle to the next artifact, plus 1 to the counter and reset timers.
@@ -253,30 +254,11 @@ public class teleop_test1 extends LinearOpMode {
                         flickOrder.clear();
                         shootingFinished = true;
                     }
-                    if (flickOrder.size() == 3){
-                        light1.setPosition(1);
-                        light2.setPosition(1);
-                    }
-                    else if (flickOrder.size() == 2){
-                        light1.setPosition(0.66);
-                        light2.setPosition(0.66);
-                    }
-                    else if (flickOrder.size() == 1){
-                        light1.setPosition(0.33);
-                        light2.setPosition(0.33);
-                    }
-                    else {
-                        light1.setPosition(0);
-                        light2.setPosition(0);
-                    }
                 }
             }
 
             //once input is let go, be ready to check again, and reset everything.
             else {
-                detect1 = cSensors.checkDetected1();
-                detect2 = cSensors.checkDetected2();
-                detect3 = cSensors.checkDetected3();
                 telemetry.addData("1", detect1);
                 telemetry.addData("2", detect2);
                 telemetry.addData("3", detect3);
@@ -318,7 +300,7 @@ public class teleop_test1 extends LinearOpMode {
 //            else lift.setPower(0);
 
             if (gamepad1.a){
-                if (flickOrder.size() == 3) intake.setPower(-1);
+                if (detect1 && detect2 && detect3) intake.setPower(-1);
                 else intake.setPower(1);
             }
             else if (gamepad1.b){
@@ -326,6 +308,22 @@ public class teleop_test1 extends LinearOpMode {
             }
             else intake.setPower(0);
 
+            if (detect1 && detect2 && detect3){
+                light1.setPosition(1);
+                light2.setPosition(1);
+            }
+            else if ((detect1 && detect2 && !detect3) || (detect1 && !detect2 && detect3) || (!detect1 && detect2 && detect3)){
+                light1.setPosition(0.66);
+                light2.setPosition(0.66);
+            }
+            else if ((detect1 && !detect2 && !detect3) || (!detect1 && !detect2 && detect3) || (!detect1 && detect2 && !detect3)){
+                light1.setPosition(0.33);
+                light2.setPosition(0.33);
+            }
+            else {
+                light1.setPosition(0);
+                light2.setPosition(0);
+            }
             if (gamepad2.dpad_left) {
                 turret.setPower(-1);
             }
