@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.decode.national;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriver;
+import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,6 +22,7 @@ import org.firstinspires.ftc.teamcode.decode.CycleGamepad;
 import org.firstinspires.ftc.teamcode.decode.DecodeRobotHardware;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 @Config
 @TeleOp(name="teleoptest1")
@@ -30,6 +33,7 @@ public class teleop_test1 extends LinearOpMode {
     DcMotor BR;
     DcMotor BL;
     IMU imu;
+//    GoBildaPinpointDriverRR pinpoint;
 
     DecodeRobotHardware robot = new DecodeRobotHardware(this);
 
@@ -43,7 +47,9 @@ public class teleop_test1 extends LinearOpMode {
     double Ki = 0;
     double Kd = 0;
     public static double Kf = 0.00325;
-    public static double targetVelocity = 190;
+    double targetVelocity = 0;
+    public static double targetVClose = 140;
+    public static double targetVFar = 190;
     private double lastError = 0;
     ElapsedTime PIDtimer = new ElapsedTime();
 
@@ -70,8 +76,20 @@ public class teleop_test1 extends LinearOpMode {
     Boolean capacityChecked = false;
     DcMotorEx lift;
     CRServo turret;
+    Servo hood;
+    ElapsedTime hoodTimer = new ElapsedTime();
+    public static double hoodPos = 0.5;
+    public static double hoodRate = 0.1;
+    public static double hoodInterval = 50;
+    public static double hoodPClose = 0.9;
+    public static double hoodPFar = 0.2;
+
     ElapsedTime loopTimer = new ElapsedTime();
     double loopTime = 0;
+    Servo light1;
+    Servo light2;
+    double oldTime = 0;
+
     @Override
     public void runOpMode() throws InterruptedException {
         FR = hardwareMap.dcMotor.get("FR");
@@ -79,12 +97,24 @@ public class teleop_test1 extends LinearOpMode {
         BR = hardwareMap.dcMotor.get("BR");
         BL = hardwareMap.dcMotor.get("BL");
 
+//        pinpoint = hardwareMap.get(GoBildaPinpointDriverRR.class, "pinpoint");
+//        pinpoint.setOffsets(136,36);
+//        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+//        pinpoint.setEncoderDirections(com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+
+//        telemetry.addData("Status", "Initialized");
+//        telemetry.addData("X offset", pinpoint.getXOffset());
+//        telemetry.addData("Y offset", pinpoint.getYOffset());
+//        telemetry.addData("Device Version Number:", pinpoint.getDeviceVersion());
+//        telemetry.addData("Device Scalar", pinpoint.getYawScalar());
+//        telemetry.update();
+
         // Retrieve the IMU from the hardware map
         imu = hardwareMap.get(IMU.class, "imu");
         // Adjust the orientation parameters to match your robot
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
@@ -110,6 +140,8 @@ public class teleop_test1 extends LinearOpMode {
         lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         lift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         turret = hardwareMap.get(CRServo.class, "turret");
+        hood = hardwareMap.get(Servo.class, "hood");
+        hood.setPosition(0.5);
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
@@ -117,10 +149,13 @@ public class teleop_test1 extends LinearOpMode {
         CycleGamepad cyclegamepad2 = new CycleGamepad(gamepad2);
         nextTimer.reset();
         cSensors.init(hardwareMap);
+        light1 = hardwareMap.get(Servo.class, "light1");
+        light2 = hardwareMap.get(Servo.class, "light2");
 
         waitForStart();
         if (isStopRequested()) return;
         while (!isStopRequested() && opModeIsActive()) {
+//            pinpoint.update();
 
             slowModeOn = cyclegamepad1.lbPressCount != 0;
 
@@ -129,14 +164,15 @@ public class teleop_test1 extends LinearOpMode {
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x * 0.7;
 
-            // This button choice was made so that it is hard to hit on accident,
-            // it can be freely changed based on preference.
-            // The equivalent button is start on Xbox-style controllers.
             if (gamepad1.start) {
                 imu.resetYaw();
+//                pinpoint.resetPosAndIMU();
             }
-
+//            Pose2d pos = pinpoint.getPositionRR();
+//            double botHeading = pos.heading.toDouble();
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+//            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.position.x, pos.position.y, pos.heading.toDouble());
+//            telemetry.addData("Position", data);
 
             // Rotate the movement direction counter to the bot's rotation
             double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -168,13 +204,13 @@ public class teleop_test1 extends LinearOpMode {
 
             loopTimer.reset();
             cyclegamepad2.updateRB(2);
+            cyclegamepad2.updateLB(2);
             double power = PIDControl(targetVelocity, shooterTop.getVelocity(AngleUnit.DEGREES));
             telemetry.addData("velocity top", shooterTop.getVelocity(AngleUnit.DEGREES));
             dashboardTelemetry.addData("velocity", shooterTop.getVelocity(AngleUnit.DEGREES));
             dashboardTelemetry.addData("reference", targetVelocity);
             dashboardTelemetry.update();
-
-            if (gamepad2.a){
+            if (gamepad2.a && shooterTop.getVelocity(AngleUnit.DEGREES) > 80){
                 //if haven't checked for artifact this press, check
                 if (!capacityChecked){
                     //check if each spot has artifact
@@ -198,10 +234,10 @@ public class teleop_test1 extends LinearOpMode {
                 if (!flickOrder.isEmpty() && !shootingFinished){
                     //actually move the flickers.
                     if (flickerTimer.seconds() <= homeTime){
-                        //if the timer is before time to move back, it's in score position.
+                        //if the PIDtimer is before time to move back, it's in score position.
                         flickOrder.get(flickCounter - 1).goScore();
                     }
-                    //if timer is after time to move back, move back.
+                    //if PIDtimer is after time to move back, move back.
                     else flickOrder.get(flickCounter - 1).goHome();
 
                     //if we reach the time to cycle to the next artifact, plus 1 to the counter and reset timers.
@@ -217,13 +253,25 @@ public class teleop_test1 extends LinearOpMode {
                         flickOrder.clear();
                         shootingFinished = true;
                     }
-                }
-                else {
-                    flicker1.setPosition(home1);
-                    flicker2.setPosition(home2);
-                    flicker3.setPosition(home3);
+                    if (flickOrder.size() == 3){
+                        light1.setPosition(1);
+                        light2.setPosition(1);
+                    }
+                    else if (flickOrder.size() == 2){
+                        light1.setPosition(0.66);
+                        light2.setPosition(0.66);
+                    }
+                    else if (flickOrder.size() == 1){
+                        light1.setPosition(0.33);
+                        light2.setPosition(0.33);
+                    }
+                    else {
+                        light1.setPosition(0);
+                        light2.setPosition(0);
+                    }
                 }
             }
+
             //once input is let go, be ready to check again, and reset everything.
             else {
                 detect1 = cSensors.checkDetected1();
@@ -232,30 +280,35 @@ public class teleop_test1 extends LinearOpMode {
                 telemetry.addData("1", detect1);
                 telemetry.addData("2", detect2);
                 telemetry.addData("3", detect3);
-
                 capacityChecked = false;
                 flickerTimer.reset();
                 nextTimer.reset();
                 flickOrder.clear();
                 flickCounter = 1;
-
+                flicker1.setPosition(home1);
+                flicker2.setPosition(home2);
+                flicker3.setPosition(home3);
             }
 
             telemetry.addData("nexttimer:", nextTimer.seconds());
-            telemetry.update();
 
-            if (cyclegamepad2.rbPressCount == 0) {
-                shooterTop.setPower(0);
-                shooterBottom.setPower(0);
-            } else {
+            if (cyclegamepad2.rbPressCount == 1 && cyclegamepad2.lbPressCount == 0){
+                targetVelocity = targetVFar;
                 shooterTop.setPower(power);
                 shooterBottom.setPower(power);
             }
+            else if (cyclegamepad2.rbPressCount == 0 && cyclegamepad2.lbPressCount == 1){
+                targetVelocity = targetVClose;
+                shooterTop.setPower(power);
+                shooterBottom.setPower(power);
+            }
+            else {
+                cyclegamepad2.rbPressCount = 0;
+                cyclegamepad2.lbPressCount = 0;
+                shooterTop.setPower(0);
+                shooterBottom.setPower(0);
+            }
 
-            telemetry.update();
-
-
-//
 //            if (gamepad2.dpad_up){
 //                lift.setPower(1);
 //            }
@@ -265,17 +318,69 @@ public class teleop_test1 extends LinearOpMode {
 //            else lift.setPower(0);
 
             if (gamepad1.a){
-                intake.setPower(1);
+                if (flickOrder.size() == 3) intake.setPower(-1);
+                else intake.setPower(1);
             }
             else if (gamepad1.b){
                 intake.setPower(-1);
             }
             else intake.setPower(0);
 
-            turret.setPower(gamepad2.left_stick_x*0.6);
+            if (gamepad2.dpad_left) {
+                turret.setPower(-1);
+            }
+            else if (gamepad2.dpad_right) {
+                turret.setPower(1);
+            }
+            else if (gamepad2.left_stick_x > 0.1 || gamepad2.left_stick_x < -0.1) {
+                turret.setPower(gamepad2.left_stick_x);
+            }
+            else turret.setPower(0);
+
+            if (gamepad2.dpad_up){
+                if (hoodTimer.milliseconds() > hoodInterval){
+                    hoodPos -= hoodRate;
+                    hoodTimer.reset();
+                }
+            }
+            else if (gamepad2.dpad_down){
+                if (hoodTimer.milliseconds() > hoodInterval){
+                    hoodPos += hoodRate;
+                    hoodTimer.reset();
+                }
+            }
+            else {
+                hoodTimer.reset();
+            }
+            if (hoodPos > 1)hoodPos = 1;
+            if (hoodPos < 0)hoodPos = 0;
+            hood.setPosition(hoodPos);
+
             loopTime = 1/loopTimer.seconds();
-            telemetry.addData("loop time (Hz)", loopTime);
+            double newTime = getRuntime();
+            double loopTime = newTime-oldTime;
+            double frequency = 1/loopTime;
+            oldTime = newTime;
+            telemetry.addData("loop time (Hz)", frequency);
+            telemetry.addData("hood pos", hoodPos);
             telemetry.update();
+//            if (cSensors.checkFull()) {
+//                light1.setPosition(1);
+//                light2.setPosition(1);
+//            }
+//            else if (cSensors.checkTwoHeld()){
+//                light1.setPosition(0.66);
+//                light2.setPosition(0.66);
+//            }
+//            else if (cSensors.checkOneHeld()){
+//                light1.setPosition(0.33);
+//                light2.setPosition(0.33);
+//            }
+//            else {
+//                light1.setPosition(0);
+//                light2.setPosition(0);
+//            }
+
         }
     }
 
@@ -288,8 +393,7 @@ public class teleop_test1 extends LinearOpMode {
 
         PIDtimer.reset();
 
-        double output = (error * Kp) + (derivative * Kd) + (integralSum * Ki) + (reference * Kf);
-        return output;
+        return (error * Kp) + (derivative * Kd) + (integralSum * Ki) + (reference * Kf);
     }
     static class Flicker {
         Servo servo;

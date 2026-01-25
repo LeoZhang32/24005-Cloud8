@@ -275,27 +275,21 @@ public class color_sensor_hardware {
 
     }
     public boolean checkDetected1(){
-        if (get1FinalColor() == DetectedColor.UNKNOWN){
-            return false;
-        }
-        else{
-            return true;
-        }
+        return get1FinalColor() != DetectedColor.UNKNOWN;
     }
     public boolean checkDetected2(){
-        if (get2FinalColor() == DetectedColor.UNKNOWN){
-            return false;
-        }
-        else{
-            return true;
-        }
+        return get2FinalColor() != DetectedColor.UNKNOWN;
     }
     public boolean checkDetected3(){
-        if (get3FinalColor() == DetectedColor.UNKNOWN){
-            return false;
-        }
-        else{
-            return true;
-        }
+        return get3FinalColor() != DetectedColor.UNKNOWN;
+    }
+    public boolean checkFull() {
+        return checkDetected1() && checkDetected2() && checkDetected3();
+    }
+    public boolean checkOneHeld(){
+        return (checkDetected1() && !checkDetected2() && !checkDetected3()) || (!checkDetected1() && checkDetected2() && !checkDetected3()) || (!checkDetected1() && !checkDetected2() && checkDetected3());
+    }
+    public boolean checkTwoHeld(){
+        return (checkDetected1() && checkDetected2() && !checkDetected3()) || (checkDetected1() && !checkDetected2() && checkDetected3()) || (!checkDetected1() && checkDetected2() && checkDetected3());
     }
 }

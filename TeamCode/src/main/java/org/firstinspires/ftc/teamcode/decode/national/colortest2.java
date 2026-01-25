@@ -84,10 +84,10 @@ public class colortest2 extends LinearOpMode {
 
                     //actually move the flickers.
                     if (flickerTimer.seconds() <= homeTime){
-                        //if the timer is before time to move back, it's in score position.
+                        //if the PIDtimer is before time to move back, it's in score position.
                         flickOrder.get(flickCounter - 1).goScore();
                     }
-                    //if timer is after time to move back, move back.
+                    //if PIDtimer is after time to move back, move back.
                     else flickOrder.get(flickCounter - 1).goHome();
                 }
             }

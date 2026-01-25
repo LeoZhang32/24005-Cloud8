@@ -85,7 +85,7 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
         the tracking point the Y (strafe) odometry pod is. forward of center is a positive number,
         backwards is a negative number.
          */
-        odo.setOffsets(133.88564, -48.69935); //these are tuned for 3110-0002-0001 Product Insight #1
+        odo.setOffsets(138, 33); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
@@ -93,7 +93,7 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
         If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
         number of ticks per mm of your odometry pod.
          */
-        odo.setEncoderResolution(37.25135188711975);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
 
         /*
@@ -117,7 +117,7 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
         telemetry.addData("X offset", odo.getXOffset());
         telemetry.addData("Y offset", odo.getYOffset());
         telemetry.addData("Device Version Number:", odo.getDeviceVersion());
-        telemetry.addData("Device SCalar", odo.getYawScalar());
+        telemetry.addData("Device Scalar", odo.getYawScalar());
         telemetry.update();
 
         // Wait for the game to start (driver presses START)
