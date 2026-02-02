@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.itd.nationals;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,10 +11,6 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
-import org.firstinspires.ftc.teamcode.PinpointDrive;
 
 
 @TeleOp
@@ -405,7 +400,7 @@ public class teleop_pinpoint1 extends LinearOpMode {
 
                     }
 
-                    // Let the drive team see that we're waiting on the motor
+                    // Let the driveRobot team see that we're waiting on the motor
                     telemetry.addData("Status", "Waiting to reach top");
                     telemetry.addData("VSlideF power", VSlideF.getPower());
                     telemetry.addData("VSlideB power", VSlideB.getPower());
@@ -445,7 +440,7 @@ public class teleop_pinpoint1 extends LinearOpMode {
 
                     }
 
-                    // Let the drive team see that we're waiting on the motor
+                    // Let the driveRobot team see that we're waiting on the motor
                     telemetry.addData("Status", "Waiting to reach bottom");
                     telemetry.addData("VSlideF power", VSlideF.getPower());
                     telemetry.addData("VSlideB power", VSlideB.getPower());
@@ -485,7 +480,7 @@ public class teleop_pinpoint1 extends LinearOpMode {
 
                     }
 
-                    // Let the drive team see that we're waiting on the motor
+                    // Let the driveRobot team see that we're waiting on the motor
                     telemetry.addData("Status", "Waiting to score specimen");
                     telemetry.addData("VSlideF power", VSlideF.getPower());
                     telemetry.addData("VSlideB power", VSlideB.getPower());

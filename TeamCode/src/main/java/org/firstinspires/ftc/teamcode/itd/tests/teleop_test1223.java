@@ -308,7 +308,7 @@ public class teleop_test1223 extends LinearOpMode{
 
                         }
 
-                        // Let the drive team see that we're waiting on the motor
+                        // Let the driveRobot team see that we're waiting on the motor
                         telemetry.addData("Status", "Waiting to reach top");
                         telemetry.addData("frontViper power", frontViper.getPower());
                         telemetry.addData("backViper power", backViper.getPower());
@@ -348,7 +348,7 @@ public class teleop_test1223 extends LinearOpMode{
 
                         }
 
-                        // Let the drive team see that we're waiting on the motor
+                        // Let the driveRobot team see that we're waiting on the motor
                         telemetry.addData("Status", "Waiting to reach bottom");
                         telemetry.addData("frontViper power", frontViper.getPower());
                         telemetry.addData("backViper power", backViper.getPower());
@@ -463,7 +463,7 @@ public class teleop_test1223 extends LinearOpMode{
 
                         }
 
-                        // Let the drive team see that we're waiting on the motor
+                        // Let the driveRobot team see that we're waiting on the motor
                         telemetry.addData("Status", "Waiting to reach top");
                         telemetry.addData("frontViper power", frontViper.getPower());
                         telemetry.addData("backViper power", backViper.getPower());
@@ -503,7 +503,7 @@ public class teleop_test1223 extends LinearOpMode{
 
                         }
 
-                        // Let the drive team see that we're waiting on the motor
+                        // Let the driveRobot team see that we're waiting on the motor
                         telemetry.addData("Status", "Waiting to reach bottom");
                         telemetry.addData("frontViper power", frontViper.getPower());
                         telemetry.addData("backViper power", backViper.getPower());
@@ -545,7 +545,7 @@ public class teleop_test1223 extends LinearOpMode{
 
                         }
 
-                        // Let the drive team see that we're waiting on the motor
+                        // Let the driveRobot team see that we're waiting on the motor
                         telemetry.addData("Status", "Waiting to reach bottom");
                         telemetry.addData("frontViper power", frontViper.getPower());
                         telemetry.addData("backViper power", backViper.getPower());
@@ -623,7 +623,7 @@ public class teleop_test1223 extends LinearOpMode{
 //                            break; // **ADDED: Exit the loop on emergency stop**
 //                        }
 //
-//                        // Let the drive team see that we're waiting on the motor
+//                        // Let the driveRobot team see that we're waiting on the motor
 //                        telemetry.addData("Status", "Waiting to reach top");
 //                        telemetry.addData("power", frontViper.getPower());
 //                        telemetry.addData("position", frontViper.getCurrentPosition());
@@ -666,7 +666,7 @@ public class teleop_test1223 extends LinearOpMode{
 //                            break; // **ADDED: Exit the loop on emergency stop**
 //                        }
 //
-//                        // Let the drive team see that we're waiting on the motor
+//                        // Let the driveRobot team see that we're waiting on the motor
 //                        telemetry.addData("Status", "Waiting to reach bottom");
 //                        telemetry.addData("power", frontViper.getPower());
 //                        telemetry.addData("position", frontViper.getCurrentPosition());
@@ -709,7 +709,7 @@ public class teleop_test1223 extends LinearOpMode{
 //                            break; // **ADDED: Exit the loop on emergency stop**
 //                        }
 //
-//                        // Let the drive team see that we're waiting on the motor
+//                        // Let the driveRobot team see that we're waiting on the motor
 //                        telemetry.addData("Status", "Waiting to reach bottom");
 //                        telemetry.addData("power", frontViper.getPower());
 //                        telemetry.addData("position", frontViper.getCurrentPosition());

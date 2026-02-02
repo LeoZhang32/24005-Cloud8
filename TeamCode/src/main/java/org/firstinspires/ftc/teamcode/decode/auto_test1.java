@@ -1,18 +1,8 @@
 package org.firstinspires.ftc.teamcode.decode;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -22,12 +12,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.PinpointDrive;
 import org.firstinspires.ftc.teamcode.itd.nationals.positions_and_variables;
 
 import java.util.List;
@@ -55,7 +41,7 @@ public final class auto_test1 extends LinearOpMode {
 
 
         Pose2d beginPose = new Pose2d(40, 63.5, (Math.toRadians(-90)));
-//        PinpointDrive drive = new PinpointDrive(hardwareMap, beginPose);
+//        PinpointDrive driveRobot = new PinpointDrive(hardwareMap, beginPose);
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
@@ -84,7 +70,7 @@ public final class auto_test1 extends LinearOpMode {
 
 
 //        //score held sample
-//        TrajectoryActionBuilder go_score_sample_0 = drive.actionBuilder(beginPose)
+//        TrajectoryActionBuilder go_score_sample_0 = driveRobot.actionBuilder(beginPose)
 //                .strafeToSplineHeading(new Vector2d(58, 58), (Math.toRadians(-135)));
 //
 //        //go to sample 3
@@ -228,7 +214,7 @@ public final class auto_test1 extends LinearOpMode {
             BR.setPower(0);
             FR.setPower(0);
             BL.setPower(0);
-//                    drive.updatePoseEstimate();
+//                    driveRobot.updatePoseEstimate();
 
 
         }

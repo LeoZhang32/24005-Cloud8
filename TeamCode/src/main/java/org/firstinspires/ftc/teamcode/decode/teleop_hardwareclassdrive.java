@@ -88,14 +88,14 @@ public class teleop_hardwareclassdrive extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            //drive variables
+            //driveRobot variables
             imuReset = gamepad1.start;
             cycleGamepad1.updateLB(2);
             drive_y = -gamepad1.left_stick_y;
             drive_x = gamepad1.left_stick_x;
             turn  =  gamepad1.right_stick_x * 0.7;
             slowModeOn = cycleGamepad1.lbPressCount == 1;
-            //drive function
+            //driveRobot function
             robot.driveRobot(drive_y, drive_x, turn, slowModeOn, imuReset);
         }
     }

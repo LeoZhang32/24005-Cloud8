@@ -22,13 +22,13 @@ import java.util.Locale;
 @Config
 public class turretpidtest_pinpoint extends LinearOpMode {
     GoBildaPinpointDriverRR pinpoint;
-    Vector2d goal = new Vector2d(-72,72);
+    Vector2d goal = new Vector2d(-63,63);
     double integralSum = 0;
-    public static double Kp = 0.09;
-    public static double Ki = 0.00008;
-    public static double Kd = 0.0056;
+    public static double Kp = 0.06;
+    public static double Ki = 0;
+    public static double Kd = 0;
     public static double Kf = 0;
-    public static double minimum = 0.3; // tune this
+    public static double minimum = 0.15; // tune this
     public static double maximum = 1; // tune this
 
     private double lastError = 0;
@@ -103,7 +103,7 @@ public class turretpidtest_pinpoint extends LinearOpMode {
             if (Math.abs(dx) > 1e-6 || Math.abs(dy) > 1e-6) {
                 robotGoalAngle = Math.toDegrees(Math.atan(dx/dy));
             }
-//            double robotGoalAngle = toDegrees(Math.acos((63-pos.position.y)/distance));
+
             double desiredAngle = 165 - robotGoalAngle + toDegrees(pinpointpos.heading.toDouble());
             if (desiredAngle < 0) {
                 desiredAngle += 360;
@@ -128,8 +128,8 @@ public class turretpidtest_pinpoint extends LinearOpMode {
             telemetry.addData("encoder pos (degrees)", currentPos);
             double power = PIDControl(desiredAngle % 360, currentPos);
             telemetry.addData("power", power);
-            if (gamepad1.b)turret.setPower(power);
-            else turret.setPower(0);
+            if (gamepad1.b)turret.setPower(0);
+            else turret.setPower(power);
             telemetry.update();
 
         }

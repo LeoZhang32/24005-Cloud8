@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /*
- * This OpMode illustrates using a camera to locate and drive towards a specific AprilTag.
+ * This OpMode illustrates using a camera to locate and driveRobot towards a specific AprilTag.
  * The code assumes a Holonomic (Mecanum or X Drive) Robot.
  *
  * For an introduction to AprilTags, see the ftc-docs link below:
@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit;
  * This information is provided in the "ftcPose" member of the returned "detection", and is explained in the ftc-docs page linked below.
  * https://ftc-docs.firstinspires.org/apriltag-detection-values
  *
- * The drive goal is to rotate to keep the Tag centered in the camera, while strafing to be directly in front of the tag, and
+ * The driveRobot goal is to rotate to keep the Tag centered in the camera, while strafing to be directly in front of the tag, and
  * driving towards the tag to achieve the desired distance.
  * To reduce any motion blur (which will interrupt the detection process) the Camera exposure is reduced to a very low value (5mS)
  * You can determine the best Exposure and Gain values by using the ConceptAprilTagOptimizeExposure OpMode in this Samples folder.
@@ -69,7 +69,7 @@ import java.util.concurrent.TimeUnit;
  * so you should choose to approach a valid tag ID (usually starting at 0)
  *
  * Under manual control, the left stick will move forward/back & left/right.  The right stick will rotate the robot.
- * Manually drive the robot until it displays Target data on the Driver Station.
+ * Manually driveRobot the robot until it displays Target data on the Driver Station.
  *
  * Press and hold the *Left Bumper* to enable the automatic "Drive to target" mode.
  * Release the Left Bumper to return to manual driving mode.
@@ -77,7 +77,7 @@ import java.util.concurrent.TimeUnit;
  * Under "Drive To Target" mode, the robot has three goals:
  * 1) Turn the robot to always keep the Tag centered on the camera frame. (Use the Target Bearing to turn the robot.)
  * 2) Strafe the robot towards the centerline of the Tag, so it approaches directly in front  of the tag.  (Use the Target Yaw to strafe the robot)
- * 3) Drive towards the Tag to get to the desired distance.  (Use Tag Range to drive the robot forward/backward)
+ * 3) Drive towards the Tag to get to the desired distance.  (Use Tag Range to driveRobot the robot forward/backward)
  *
  * Use DESIRED_DISTANCE to set how close you want the robot to get to the target.
  * Speed and Turn sensitivity can be adjusted using the SPEED_GAIN, STRAFE_GAIN and TURN_GAIN constants.
@@ -94,7 +94,7 @@ public class DriveToApril extends LinearOpMode
     final double DESIRED_DISTANCE = 60; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
-    //  applied to the drive motors to correct the error.
+    //  applied to the driveRobot motors to correct the error.
     //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
     final double SPEED_GAIN  =  0.05  ;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0) pr 0.02
     final double STRAFE_GAIN =  0.03 ;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0) pr 0.015
@@ -104,10 +104,10 @@ public class DriveToApril extends LinearOpMode
     final double MAX_AUTO_STRAFE= 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
 
-    private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
-    private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
-    private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
-    private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
+    private DcMotor leftFrontDrive   = null;  //  Used to control the left front driveRobot wheel
+    private DcMotor rightFrontDrive  = null;  //  Used to control the right front driveRobot wheel
+    private DcMotor leftBackDrive    = null;  //  Used to control the left back driveRobot wheel
+    private DcMotor rightBackDrive   = null;  //  Used to control the right back driveRobot wheel
 
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private static final int DESIRED_TAG_ID = 24;     // Choose the tag you want to approach or set to -1 for ANY tag.
@@ -131,7 +131,7 @@ public class DriveToApril extends LinearOpMode
         leftBackDrive   = hardwareMap.get(DcMotor.class, "BL");
         rightBackDrive  = hardwareMap.get(DcMotor.class, "BR");
 
-// Set motor directions for mechanum drive
+// Set motor directions for mechanum driveRobot
 // These directions may need to be adjusted based on your specific robot
         leftFrontDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -200,8 +200,8 @@ public class DriveToApril extends LinearOpMode
                 telemetry.addData("Auto","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             } else {
 
-                // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-                drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
+                // driveRobot using manual POV Joystick mode.  Slow things down to make the robot more controlable.
+                drive  = -gamepad1.left_stick_y  / 2.0;  // Reduce driveRobot rate to 50%.
                 strafe = -gamepad1.left_stick_x  / 2.0;  // Reduce strafe rate to 50%.
                 turn   = -gamepad1.right_stick_x / 3.0;  // Reduce turn rate to 33%.
                 telemetry.addData("Manual","Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);

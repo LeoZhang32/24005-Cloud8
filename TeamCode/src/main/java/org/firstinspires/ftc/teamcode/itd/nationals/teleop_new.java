@@ -404,7 +404,7 @@ public class teleop_new extends LinearOpMode {
 
                     }
 
-                    // Let the drive team see that we're waiting on the motor
+                    // Let the driveRobot team see that we're waiting on the motor
                     telemetry.addData("Status", "Waiting to reach top");
                     telemetry.addData("VSlideF power", VSlideF.getPower());
                     telemetry.addData("VSlideB power", VSlideB.getPower());
@@ -444,7 +444,7 @@ public class teleop_new extends LinearOpMode {
 
                     }
 
-                    // Let the drive team see that we're waiting on the motor
+                    // Let the driveRobot team see that we're waiting on the motor
                     telemetry.addData("Status", "Waiting to reach bottom");
                     telemetry.addData("VSlideF power", VSlideF.getPower());
                     telemetry.addData("VSlideB power", VSlideB.getPower());
@@ -484,7 +484,7 @@ public class teleop_new extends LinearOpMode {
 
                     }
 
-                    // Let the drive team see that we're waiting on the motor
+                    // Let the driveRobot team see that we're waiting on the motor
                     telemetry.addData("Status", "Waiting to score specimen");
                     telemetry.addData("VSlideF power", VSlideF.getPower());
                     telemetry.addData("VSlideB power", VSlideB.getPower());

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.decode.national;
+package org.firstinspires.ftc.teamcode.decode.national.hardware;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;

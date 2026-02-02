@@ -268,7 +268,7 @@ public class teleop_backup_1129 extends LinearOpMode{
                 // Loop while the motor is moving to the target
                 while ((frontViper.isBusy()) && (backViper.isBusy())&& !isStopRequested()) {
 
-                // Let the drive team see that we're waiting on the motor
+                // Let the driveRobot team see that we're waiting on the motor
                     telemetry.addData("Status", "Waiting to reach top");
                     telemetry.addData("power", frontViper.getPower());
                     telemetry.addData("position", frontViper.getCurrentPosition());
@@ -308,7 +308,7 @@ public class teleop_backup_1129 extends LinearOpMode{
                 // Loop while the motor is moving to the target
                 while ((frontViper.isBusy()) && backViper.isBusy() && !isStopRequested()) {
 
-                    // Let the drive team see that we're waiting on the motor
+                    // Let the driveRobot team see that we're waiting on the motor
                     telemetry.addData("Status", "Waiting to reach bottom");
                     telemetry.addData("power", frontViper.getPower());
                     telemetry.addData("position", frontViper.getCurrentPosition());

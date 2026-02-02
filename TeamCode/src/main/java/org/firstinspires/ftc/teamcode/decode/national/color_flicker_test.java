@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.decode.national.hardware.color_sensor_hardware;
+
 @TeleOp
 public class color_flicker_test extends LinearOpMode {
     ElapsedTime nextTimer = new ElapsedTime();

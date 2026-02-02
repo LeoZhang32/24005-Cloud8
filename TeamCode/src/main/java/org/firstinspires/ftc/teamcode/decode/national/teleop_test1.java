@@ -2,9 +2,6 @@ package org.firstinspires.ftc.teamcode.decode.national;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriver;
-import com.acmerobotics.roadrunner.ftc.GoBildaPinpointDriverRR;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -20,9 +17,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.decode.CycleGamepad;
 import org.firstinspires.ftc.teamcode.decode.DecodeRobotHardware;
+import org.firstinspires.ftc.teamcode.decode.national.hardware.color_sensor_hardware;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 @Config
 @TeleOp(name="teleoptest1")
@@ -205,6 +202,7 @@ public class teleop_test1 extends LinearOpMode {
             loopTimer.reset();
             cyclegamepad2.updateRB(2);
             cyclegamepad2.updateLB(2);
+            cyclegamepad1.updateLB(2);
             double power = PIDControl(targetVelocity, shooterTop.getVelocity(AngleUnit.DEGREES));
             telemetry.addData("velocity top", shooterTop.getVelocity(AngleUnit.DEGREES));
             dashboardTelemetry.addData("velocity", shooterTop.getVelocity(AngleUnit.DEGREES));

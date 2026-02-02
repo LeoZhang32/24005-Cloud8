@@ -27,7 +27,7 @@ public class DriveToApril_Teleop2 extends LinearOpMode
     final double DESIRED_DISTANCE = 60; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
-    //  applied to the drive motors to correct the error.
+    //  applied to the driveRobot motors to correct the error.
     //  Drive = Error * Gain    Make these values smaller for smoother control, or larger for a more aggressive response.
     final double SPEED_GAIN  =  0.05  ;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0) pr 0.02
     final double STRAFE_GAIN =  0.03 ;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0) pr 0.015
@@ -37,10 +37,10 @@ public class DriveToApril_Teleop2 extends LinearOpMode
     final double MAX_AUTO_STRAFE= 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
 
-    private DcMotor leftFrontDrive   = null;  //  Used to control the left front drive wheel
-    private DcMotor rightFrontDrive  = null;  //  Used to control the right front drive wheel
-    private DcMotor leftBackDrive    = null;  //  Used to control the left back drive wheel
-    private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
+    private DcMotor leftFrontDrive   = null;  //  Used to control the left front driveRobot wheel
+    private DcMotor rightFrontDrive  = null;  //  Used to control the right front driveRobot wheel
+    private DcMotor leftBackDrive    = null;  //  Used to control the left back driveRobot wheel
+    private DcMotor rightBackDrive   = null;  //  Used to control the right back driveRobot wheel
 
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private static final int DESIRED_TAG_ID = 24;     // Choose the tag you want to approach or set to -1 for ANY tag.
@@ -81,7 +81,7 @@ public class DriveToApril_Teleop2 extends LinearOpMode
         );
         imu.initialize(parameters);
 
-        // Set motor directions for mecanum drive
+        // Set motor directions for mecanum driveRobot
         leftFrontDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -102,7 +102,7 @@ public class DriveToApril_Teleop2 extends LinearOpMode
 
         while (opModeIsActive())
         {
-            // Check for drive mode changes
+            // Check for driveRobot mode changes
             checkDriveModeButtons();
 
             targetFound = false;
@@ -191,7 +191,7 @@ public class DriveToApril_Teleop2 extends LinearOpMode
                 }
             }
 
-            // Update drive mode and control info
+            // Update driveRobot mode and control info
             telemetry.addData("Drive Mode", isFieldCentric ? "FIELD-CENTRIC" : "ROBOT-CENTRIC");
             telemetry.addData("Slow Mode", slowMode ? "ON" : "OFF");
             telemetry.addData("Controls", "LB:Auto | START/SELECT:Mode | DPAD UP:Slow");
@@ -205,7 +205,7 @@ public class DriveToApril_Teleop2 extends LinearOpMode
     }
 
     /**
-     * Check for drive mode and slow mode button presses
+     * Check for driveRobot mode and slow mode button presses
      */
     private void checkDriveModeButtons() {
         // Toggle field-centric mode with START button

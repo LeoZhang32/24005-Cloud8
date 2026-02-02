@@ -111,7 +111,7 @@ public class Tuning extends SelectableOpMode {
         Drawing.drawDebug(follower);
     }
 
-    /** This creates a full stop of the robot by setting the drive motors to run at 0 power. */
+    /** This creates a full stop of the robot by setting the driveRobot motors to run at 0 power. */
     public static void stopRobot() {
         follower.startTeleopDrive(true);
         follower.setTeleOpDrive(0,0,0,true);
@@ -119,7 +119,7 @@ public class Tuning extends SelectableOpMode {
 }
 
 /**
- * This is the LocalizationTest OpMode. This is basically just a simple mecanum drive attached to a
+ * This is the LocalizationTest OpMode. This is basically just a simple mecanum driveRobot attached to a
  * PoseUpdater. The OpMode will print out the robot's pose to telemetry as well as draw the robot.
  * You should use this to check the robot's localization.
  *
@@ -133,11 +133,11 @@ class LocalizationTest extends OpMode {
         follower.setStartingPose(new Pose(72,72));
     }
 
-    /** This initializes the PoseUpdater, the mecanum drive motors, and the Panels telemetry. */
+    /** This initializes the PoseUpdater, the mecanum driveRobot motors, and the Panels telemetry. */
     @Override
     public void init_loop() {
         telemetryM.debug("This will print your robot's position to telemetry while "
-                + "allowing robot control through a basic mecanum drive on gamepad 1.");
+                + "allowing robot control through a basic mecanum driveRobot on gamepad 1.");
         telemetryM.update(telemetry);
         follower.update();
         drawOnlyCurrent();
@@ -150,7 +150,7 @@ class LocalizationTest extends OpMode {
     }
 
     /**
-     * This updates the robot's pose estimate, the simple mecanum drive, and updates the
+     * This updates the robot's pose estimate, the simple mecanum driveRobot, and updates the
      * Panels telemetry with the robot's position as well as draws the robot's position.
      */
     @Override
@@ -340,7 +340,7 @@ class ForwardVelocityTuner extends OpMode {
         follower.setStartingPose(new Pose(72, 72));
     }
 
-    /** This initializes the drive motors as well as the cache of velocities and the Panels telemetry. */
+    /** This initializes the driveRobot motors as well as the cache of velocities and the Panels telemetry. */
     @Override
     public void init_loop() {
         telemetryM.debug("The robot will run at 1 power until it reaches " + DISTANCE + " inches forward.");
@@ -353,7 +353,7 @@ class ForwardVelocityTuner extends OpMode {
         drawOnlyCurrent();
     }
 
-    /** This starts the OpMode by setting the drive motors to run forward at full power. */
+    /** This starts the OpMode by setting the driveRobot motors to run forward at full power. */
     @Override
     public void start() {
         for (int i = 0; i < RECORD_NUMBER; i++) {
@@ -448,7 +448,7 @@ class LateralVelocityTuner extends OpMode {
     }
 
     /**
-     * This initializes the drive motors as well as the cache of velocities and the Panels
+     * This initializes the driveRobot motors as well as the cache of velocities and the Panels
      * telemetryM.
      */
     @Override
@@ -462,7 +462,7 @@ class LateralVelocityTuner extends OpMode {
         drawOnlyCurrent();
     }
 
-    /** This starts the OpMode by setting the drive motors to run left at full power. */
+    /** This starts the OpMode by setting the driveRobot motors to run left at full power. */
     @Override
     public void start() {
         for (int i = 0; i < RECORD_NUMBER; i++) {
@@ -527,7 +527,7 @@ class LateralVelocityTuner extends OpMode {
  * stops. The accelerations across the entire time the robot is slowing down is then averaged and
  * that number is then printed. This is used to determine how the robot will decelerate in the
  * forward direction when power is cut, making the estimations used in the calculations for the
- * drive Vector more accurate and giving better braking at the end of Paths.
+ * driveRobot Vector more accurate and giving better braking at the end of Paths.
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @author Baron Henderson - 20077 The Indubitables
@@ -550,7 +550,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
         follower.setStartingPose(new Pose(72, 72));
     }
 
-    /** This initializes the drive motors as well as the Panels telemetryM. */
+    /** This initializes the driveRobot motors as well as the Panels telemetryM. */
     @Override
     public void init_loop() {
         telemetryM.debug("The robot will run forward until it reaches " + VELOCITY + " inches per second.");
@@ -563,7 +563,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
         drawOnlyCurrent();
     }
 
-    /** This starts the OpMode by setting the drive motors to run forward at full power. */
+    /** This starts the OpMode by setting the driveRobot motors to run forward at full power. */
     @Override
     public void start() {
         follower.startTeleopDrive(false);
@@ -633,7 +633,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
  * stops. The accelerations across the entire time the robot is slowing down is then averaged and
  * that number is then printed. This is used to determine how the robot will decelerate in the
  * forward direction when power is cut, making the estimations used in the calculations for the
- * drive Vector more accurate and giving better braking at the end of Paths.
+ * driveRobot Vector more accurate and giving better braking at the end of Paths.
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @author Aaron Yang - 10158 Scott's Bots
@@ -654,7 +654,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
         follower.setStartingPose(new Pose(72, 72));
     }
 
-    /** This initializes the drive motors as well as the Panels telemetry. */
+    /** This initializes the driveRobot motors as well as the Panels telemetry. */
     @Override
     public void init_loop() {
         telemetryM.debug("The robot will run to the left until it reaches " + VELOCITY + " inches per second.");
@@ -667,7 +667,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
         drawOnlyCurrent();
     }
 
-    /** This starts the OpMode by setting the drive motors to run forward at full power. */
+    /** This starts the OpMode by setting the driveRobot motors to run forward at full power. */
     @Override
     public void start() {
         follower.startTeleopDrive(false);
@@ -954,8 +954,8 @@ class DriveTuner extends OpMode {
 }
 
 /**
- * This is the Line Test Tuner OpMode. It will drive the robot forward and back
- * The user should push the robot laterally and angular to test out the drive, heading, and translational PIDFs.
+ * This is the Line Test Tuner OpMode. It will driveRobot the robot forward and back
+ * The user should push the robot laterally and angular to test out the driveRobot, heading, and translational PIDFs.
  *
  * @author Baron Henderson - 20077 The Indubitables
  * @author Anyi Lin - 10158 Scott's Bots
@@ -980,7 +980,7 @@ class Line extends OpMode {
     public void init_loop() {
         telemetryM.debug("This will activate all the PIDF(s)");
         telemetryM.debug("The robot will go forward and backward continuously along the path while correcting.");
-        telemetryM.debug("You can adjust the PIDF values to tune the robot's drive PIDF(s).");
+        telemetryM.debug("You can adjust the PIDF values to tune the robot's driveRobot PIDF(s).");
         telemetryM.update(telemetry);
         follower.update();
         drawOnlyCurrent();
@@ -1021,7 +1021,7 @@ class Line extends OpMode {
  * This is the Centripetal Tuner OpMode. It runs the robot in a specified distance
  * forward and to the left. On reaching the end of the forward Path, the robot runs the backward
  * Path the same distance back to the start. Rinse and repeat! This is good for testing a variety
- * of Vectors, like the drive Vector, the translational Vector, the heading Vector, and the
+ * of Vectors, like the driveRobot Vector, the translational Vector, the heading Vector, and the
  * centripetal Vector.
  *
  * @author Baron Henderson - 20077 The Indubitables
