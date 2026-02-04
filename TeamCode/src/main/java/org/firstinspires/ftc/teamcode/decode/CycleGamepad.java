@@ -11,7 +11,8 @@ public class CycleGamepad {
     private boolean previousBState = false;
     private boolean previousLBState = false;
     private boolean previousRBState = false;
-    public int xPressCount, yPressCount, aPressCount, bPressCount, lbPressCount, rbPressCount = 0;
+    private boolean previousStartState = false;
+    public int xPressCount, yPressCount, aPressCount, bPressCount, lbPressCount, rbPressCount, startPressCount = 0;
 
     public CycleGamepad(Gamepad gamepad) {
         this.gamepad = gamepad;
@@ -85,5 +86,16 @@ public class CycleGamepad {
             }
         }
         previousRBState = currentRBState;
+    }
+    public void updateStart(int cycles) {
+        boolean currentStartState = gamepad.start;
+        if (currentStartState && !previousStartState) { // Prevent "button held down" behavior
+            // Increment the press count and ensure it loops between 0 and 2
+            startPressCount++;
+            if (startPressCount > (cycles-1)){
+                startPressCount = 0;
+            }
+        }
+        previousStartState = currentStartState;
     }
 }

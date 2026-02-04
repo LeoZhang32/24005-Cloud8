@@ -283,13 +283,4 @@ public class color_sensor_hardware {
     public boolean checkDetected3(){
         return get3FinalColor() != DetectedColor.UNKNOWN;
     }
-    public boolean checkFull() {
-        return checkDetected1() && checkDetected2() && checkDetected3();
-    }
-    public boolean checkOneHeld(){
-        return (checkDetected1() && !checkDetected2() && !checkDetected3()) || (!checkDetected1() && checkDetected2() && !checkDetected3()) || (!checkDetected1() && !checkDetected2() && checkDetected3());
-    }
-    public boolean checkTwoHeld(){
-        return (checkDetected1() && checkDetected2() && !checkDetected3()) || (checkDetected1() && !checkDetected2() && checkDetected3()) || (!checkDetected1() && checkDetected2() && checkDetected3());
-    }
 }

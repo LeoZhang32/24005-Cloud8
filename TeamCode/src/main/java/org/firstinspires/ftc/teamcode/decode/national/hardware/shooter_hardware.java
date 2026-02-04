@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -17,6 +18,8 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+import java.util.List;
+
 @Config
 public class shooter_hardware {
     private LinearOpMode myOpMode = null;
@@ -29,6 +32,7 @@ public class shooter_hardware {
     double desiredXOffset = 0;
     double hoodPos = 0;
     public static double minimum = 0.1;
+    double manualOffset = 0;
 //    public static double targetVel = 0;
     ElapsedTime timer = new ElapsedTime();
     encoders_hardware encoders = new encoders_hardware();
@@ -53,24 +57,31 @@ public class shooter_hardware {
         return (error * Kp) + (reference * Kf);
     }
     public void controlOuttake(boolean reset, boolean shooterInput, boolean isRed, Pose2D initPose) {
+        if (isRed) limelight.pipelineSwitch(0);
+        else limelight.pipelineSwitch(2);
+
         LLResult llResult = limelight.getLatestResult();
         Pose2d pos = encoders.getPinpointPos(reset, initPose);
-        Vector2d goal = new Vector2d(-72,68);
+        Vector2d goal = new Vector2d(-68,72);
         double dx = Math.abs(goal.x - pos.position.x);
         double dy = Math.abs(goal.y - pos.position.y);
         double robotGoalAngle = 0;
         if (Math.abs(dx) > 1e-6 || Math.abs(dy) > 1e-6) {
             robotGoalAngle = Math.toDegrees(Math.atan(dx/dy));
         }
-        double desiredAngle = 0 - robotGoalAngle + Math.toDegrees(pos.heading.toDouble());
-        if (desiredAngle < -165) {
+
+        if (myOpMode.gamepad2.dpad_right) manualOffset += 1;
+        if (myOpMode.gamepad2.dpad_left) manualOffset -= 1;
+
+        double desiredAngle = 0 - robotGoalAngle + Math.toDegrees(pos.heading.toDouble()) + manualOffset;
+        if (desiredAngle < -135) {
             desiredAngle += 360;
         }
         if (Double.isNaN(desiredAngle)) {
             desiredAngle = 0;
         }
 
-        desiredAngle = Range.clip(desiredAngle,-165,195);
+        desiredAngle = Range.clip(desiredAngle,-135,130);
 
 
         double distance = Math.sqrt(Math.pow((pos.position.x-goal.x),2) + Math.pow((pos.position.y-goal.y),2));
@@ -82,10 +93,11 @@ public class shooter_hardware {
 
         hood.setPosition(hoodPos);
 
-        double targetVel = 0.82185 * distance + 91.39032;
+        double targetVel = 0;
         double shooterPower = 0;
-        if (distance < 100) shooterPower = PIDControlShooter(targetVel, encoders.getShooterVel(), 0.0325,0.00325);
-        else shooterPower = 190;
+        if (distance < 100) targetVel = 0.82185 * distance + 86.39032;
+        else targetVel = 190;
+        shooterPower = PIDControlShooter(targetVel, encoders.getShooterVel(), 0.0325,0.00325);
         double turretPower = 0;
 
         if (robotGoalAngle >= 0 && robotGoalAngle < 30){
@@ -100,13 +112,13 @@ public class shooter_hardware {
         if (shooterInput){
             shooterTop.setPower(shooterPower);
             shooterBottom.setPower(shooterPower);
-            if (encoders.getTurretPos() > desiredAngle - 10 && encoders.getTurretPos() < desiredAngle + 10) {
+            if (encoders.getTurretPos() > desiredAngle - 10 && encoders.getTurretPos() < desiredAngle + 10 && encoders.getTurretPos() > -135 && encoders.getTurretPos() < 130 && distance >=100) {
                 if (llResult != null){
                     if (llResult.isValid()){
                         double xOffset = llResult.getTx();
                         myOpMode.telemetry.addData("xOffset", xOffset);
                         if (isRed) turretPower = -(PIDControlLimelight(desiredXOffset, xOffset, 0.05,0.0067,0));
-                        else turretPower = -(PIDControlLimelight(-desiredXOffset, xOffset, 0.05,0.0067,0));
+                        else turretPower = -(PIDControlLimelight(-desiredXOffset, xOffset, 0.05,0.00067,0));
                     }
                     else {
                         myOpMode.telemetry.addData("target", "INVALID");
