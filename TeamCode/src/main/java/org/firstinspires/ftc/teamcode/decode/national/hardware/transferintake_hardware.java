@@ -34,6 +34,8 @@ public class transferintake_hardware {
     int patternIndex = 0;
     int greenIndex = 0;
     int purpleIndex = 0;
+    boolean lastX = false;
+    boolean lastY = false;
 
     ArrayList<Flicker> flickOrder = new ArrayList<>();
     ArrayList<Flicker> purple = new ArrayList<>();
@@ -392,19 +394,22 @@ public class transferintake_hardware {
             boolean x = myOpMode.gamepad2.x;
             boolean y = myOpMode.gamepad2.y;
 
+            boolean xPressed = x && !lastX;
+            boolean yPressed = y && !lastY;
+
             // build lists ONCE
-            if ((x || y) && !capacityChecked) {
+            if ((xPressed || yPressed) && !capacityChecked) {
                 purple.clear();
                 green.clear();
 
                 if (color1 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f1);
-                if (color1 == color_sensor_hardware.DetectedColor.GREEN) green.add(f1);
+                if (color1 == color_sensor_hardware.DetectedColor.GREEN)  green.add(f1);
 
                 if (color2 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f2);
-                if (color2 == color_sensor_hardware.DetectedColor.GREEN) green.add(f2);
+                if (color2 == color_sensor_hardware.DetectedColor.GREEN)  green.add(f2);
 
                 if (color3 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f3);
-                if (color3 == color_sensor_hardware.DetectedColor.GREEN) green.add(f3);
+                if (color3 == color_sensor_hardware.DetectedColor.GREEN)  green.add(f3);
 
                 purpleIndex = 0;
                 greenIndex = 0;
@@ -414,48 +419,40 @@ public class transferintake_hardware {
             }
 
             // X = PURPLE
-            if (x && purpleIndex < purple.size()) {
+            if (xPressed && purpleIndex < purple.size()) {
                 Flicker f = purple.get(purpleIndex);
-                runFlicker(f);
-                if (nextTimer.seconds() >= nextTime){
-                    nextTimer.reset();
-                    flickerTimer.reset();
-                    purpleIndex++;
-                }
-            }
-            else {
-                f1.goHome();
-                f2.goHome();
-                f3.goHome();
+
+                f.goScore();
+                flickerTimer.reset();
+
+                purpleIndex++;
             }
 
             // Y = GREEN
-            if (y && greenIndex < green.size()) {
+            if (yPressed && greenIndex < green.size()) {
                 Flicker f = green.get(greenIndex);
-                runFlicker(f);
-                if (nextTimer.seconds() >= nextTime){
-                    nextTimer.reset();
-                    flickerTimer.reset();
-                    greenIndex++;
-                }
+
+                f.goScore();
+                flickerTimer.reset();
+
+                greenIndex++;
             }
-            else {
+
+            // return all flickers home after time
+            if (flickerTimer.seconds() > homeTime) {
                 f1.goHome();
                 f2.goHome();
                 f3.goHome();
             }
-
 
             // done condition
-            if (purpleIndex >= purple.size() || greenIndex >= green.size()) {
+            if (purpleIndex >= purple.size() && greenIndex >= green.size()) {
                 shootingFinished = true;
                 capacityChecked = false;
-                nextTimer.reset();
-                flickerTimer.reset();
-                f1.goHome();
-                f2.goHome();
-                f3.goHome();
             }
+
+            lastX = x;
+            lastY = y;
         }
 
         if (myOpMode.gamepad1.a) {
@@ -465,19 +462,16 @@ public class transferintake_hardware {
             intake.setPower(-1);
         } else intake.setPower(0);
 
-        if (detect1 && detect2 && detect3) {
-            light1.setPosition(1);
-            light2.setPosition(1);
-        } else if ((detect1 && detect2 && !detect3) || (detect1 && !detect2 && detect3) || (!detect1 && detect2 && detect3)) {
-            light1.setPosition(0.6);
-            light2.setPosition(0.6);
-        } else if ((detect1 && !detect2 && !detect3) || (!detect1 && !detect2 && detect3) || (!detect1 && detect2 && !detect3)) {
-            light1.setPosition(0.388);
-            light2.setPosition(0.388);
-        } else {
-            light1.setPosition(0);
-            light2.setPosition(0);
-        }
+        if (color1 == color_sensor_hardware.DetectedColor.PURPLE) light1.setPosition(0.722);
+        if (color2 == color_sensor_hardware.DetectedColor.PURPLE) light2.setPosition(0.722);
+        if (color3 == color_sensor_hardware.DetectedColor.PURPLE) light3.setPosition(0.722);
+        if (color1 == color_sensor_hardware.DetectedColor.GREEN) light1.setPosition(0.5);
+        if (color2 == color_sensor_hardware.DetectedColor.GREEN) light2.setPosition(0.5);
+        if (color3 == color_sensor_hardware.DetectedColor.GREEN) light3.setPosition(0.5);
+        if (color1 == color_sensor_hardware.DetectedColor.UNKNOWN) light1.setPosition(0);
+        if (color2 == color_sensor_hardware.DetectedColor.UNKNOWN) light2.setPosition(0);
+        if (color3 == color_sensor_hardware.DetectedColor.UNKNOWN) light3.setPosition(0);
+
         myOpMode.telemetry.addData("patternIndex", patternIndex);
         myOpMode.telemetry.addData("greenIndex", greenIndex);
         myOpMode.telemetry.addData("purpleIndex", purpleIndex);

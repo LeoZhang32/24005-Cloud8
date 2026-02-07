@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.decode.national.auto; // make sure this aligns with class location
+package org.firstinspires.ftc.teamcode.decode.national.auto.BLUE; // make sure this aligns with class location
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
 
-@Autonomous(name = "AAA NEAR RED")
-public class nearsoloRED1 extends CommandOpMode {
+@Autonomous(name = "AAA NEAR SOLO BLUE", group = "AAA BLUE")
+public class nearsoloBLUE1 extends CommandOpMode {
     private Follower follower;
 
     DcMotorEx shooterTop;
@@ -61,21 +61,21 @@ public class nearsoloRED1 extends CommandOpMode {
     int greenIndex = 0;
     int purpleIndex = 0;
     boolean leaveActivated = false;
-    ArrayList<nearsoloRED1.Flicker> flickOrder = new ArrayList<>();
+    ArrayList<Flicker> flickOrder = new ArrayList<>();
     ArrayList<Flicker> purple = new ArrayList<>();
     ArrayList<Flicker> green = new ArrayList<>();
     color_sensor_hardware cSensors = new color_sensor_hardware();
-    private final Pose startPose = new Pose(81.25, 134.5, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(90));// Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-    private final Pose scorePose = new Pose (94,104,Math.toRadians(0));
-    private final Pose go1Pose = new Pose(93, 86, Math.toRadians(0));
-    private final Pose pickup1Pose = new Pose(120, 77, Math.toRadians(0));
-    private final Pose go2Pose = new Pose(93, 61, Math.toRadians(0));
-    private final Pose pickup2Pose = new Pose(131, 61, Math.toRadians(0));
-    private final Pose exit2Pose = new Pose (110, 61, Math.toRadians(0));
-    private final Pose go3Pose = new Pose(93, 35.8, Math.toRadians(0));
-    private final Pose pickup3Pose = new Pose(131, 35.8, Math.toRadians(0));
-    private final Pose leavePose = new Pose (113, 72, Math.toRadians(0));
+    private final Pose startPose = new Pose(81.25, 134.5, Math.toRadians(90)).mirror(); // Start Pose of our robot.
+    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(90)).mirror();// Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose scorePose = new Pose (94,104,Math.toRadians(0)).mirror();
+    private final Pose go1Pose = new Pose(93, 86, Math.toRadians(0)).mirror();
+    private final Pose pickup1Pose = new Pose(120, 77, Math.toRadians(0)).mirror();
+    private final Pose go2Pose = new Pose(93, 61, Math.toRadians(0)).mirror();
+    private final Pose pickup2Pose = new Pose(131, 61, Math.toRadians(0)).mirror();
+    private final Pose exit2Pose = new Pose (110, 61, Math.toRadians(0)).mirror();
+    private final Pose go3Pose = new Pose(93, 35.8, Math.toRadians(0)).mirror();
+    private final Pose pickup3Pose = new Pose(131, 35.8, Math.toRadians(0)).mirror();
+    private final Pose leavePose = new Pose (113, 72, Math.toRadians(0)).mirror();
     private PathChain scorePreload, gotoPickup1, grabPickup1, gotoPickup2, grabPickup2, gotoPickup3, grabPickup3, scorePickup1, scorePickup2, scorePickup3, leave, exit2;
 
     public void buildPaths() {
@@ -497,6 +497,9 @@ public class nearsoloRED1 extends CommandOpMode {
             leaveActivated = true;
         });
     }
+    private InstantCommand reverseIntake(){
+        return new InstantCommand(()-> intake.setPower(-1));
+    }
     private double PIDControlShooter(double reference, double state, double Kp, double Kf){
         double error = reference - state;
 
@@ -547,7 +550,7 @@ public class nearsoloRED1 extends CommandOpMode {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new ParallelCommandGroup(
-                                        moveTurret(-10).withTimeout(1000),
+                                        moveTurret(10).withTimeout(1000),
                                         checkMotif().withTimeout(1000)
                                 ),
                                 moveTurret(51).interruptOn(()-> shootingFinished)
@@ -571,6 +574,11 @@ public class nearsoloRED1 extends CommandOpMode {
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(follower, scorePickup1).setGlobalMaxPower(1),
                                         new SequentialCommandGroup(
+                                                reverseIntake(),
+                                                new WaitCommand(750),
+                                                stopIntake()
+                                        ),
+                                        new SequentialCommandGroup(
                                                 new WaitCommand(1000),
                                                 spinShooter(135).interruptOn(() -> shootingFinished)
                                         ),
@@ -588,6 +596,11 @@ public class nearsoloRED1 extends CommandOpMode {
                                 stopIntake(),
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(follower, scorePickup2).setGlobalMaxPower(1),
+                                        new SequentialCommandGroup(
+                                                reverseIntake(),
+                                                new WaitCommand(750),
+                                                stopIntake()
+                                        ),
                                         new SequentialCommandGroup(
                                                 new WaitCommand(1500),
                                                 spinShooter(135).interruptOn(() -> shootingFinished)
@@ -607,6 +620,11 @@ public class nearsoloRED1 extends CommandOpMode {
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(follower, scorePickup3).setGlobalMaxPower(1),
                                         new SequentialCommandGroup(
+                                                reverseIntake(),
+                                                new WaitCommand(750),
+                                                stopIntake()
+                                        ),
+                                        new SequentialCommandGroup(
                                                 new WaitCommand(2000),
                                                 spinShooter(135).interruptOn(() -> shootingFinished)
                                         ),
@@ -618,7 +636,7 @@ public class nearsoloRED1 extends CommandOpMode {
                                 resetFlickers(),
                                 stopShooter()
                         ),
-                        moveTurret(-36).interruptOn(()-> leaveActivated)
+                        moveTurret(36).interruptOn(()-> leaveActivated)
                 ),
                 new FollowPathCommand(follower, leave),
                 moveTurret(0).withTimeout(10000)

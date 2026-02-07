@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.decode.national.hardware;
+package org.firstinspires.ftc.teamcode.decode.national.teleop.BLUE;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,10 +8,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.decode.CycleGamepad;
+import org.firstinspires.ftc.teamcode.decode.national.hardware.dt_hardware;
+import org.firstinspires.ftc.teamcode.decode.national.hardware.encoders_hardware;
+import org.firstinspires.ftc.teamcode.decode.national.hardware.lift_hardware;
+import org.firstinspires.ftc.teamcode.decode.national.hardware.shooter_hardware;
+import org.firstinspires.ftc.teamcode.decode.national.hardware.transferintake_hardware;
+
 @Config
-@Disabled
-@TeleOp (name = "A TELEOP RED 1")
-public class teleopRED1 extends LinearOpMode {
+@TeleOp (name = "A TELEOP BLUE PPG", group = "AAA BLUE")
+public class teleopBLUE_PPG extends LinearOpMode {
+    int motif = 3;
     shooter_hardware shooter = new shooter_hardware(this);
     transferintake_hardware transferAndIntake = new transferintake_hardware(this);
     encoders_hardware encoders = new encoders_hardware();
@@ -20,7 +25,7 @@ public class teleopRED1 extends LinearOpMode {
     lift_hardware lift = new lift_hardware(this);
     @Override
     public void runOpMode() throws InterruptedException {
-        shooter.init(hardwareMap, 0);
+        shooter.init(hardwareMap, 2);
         transferAndIntake.init(hardwareMap);
         encoders.init(hardwareMap);
         dt.init(hardwareMap);
@@ -31,8 +36,8 @@ public class teleopRED1 extends LinearOpMode {
         while (!isStopRequested() && opModeIsActive()){
             cyclegamepad1.updateLB(2);
             cyclegamepad2.updateRB(2);
-            shooter.controlOuttake(gamepad1.start,cyclegamepad2.rbPressCount == 1,true, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.RADIANS,0));
-            transferAndIntake.transferandintake();
+            shooter.controlOuttake(gamepad1.start,cyclegamepad2.rbPressCount == 1,false, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.RADIANS,0));
+            transferAndIntake.sortTransferAndIntake(gamepad2.x || gamepad2.y, motif);
             dt.driveRobot(-gamepad1.left_stick_y, gamepad1.left_stick_x,gamepad1.right_stick_x * 0.7, cyclegamepad1.lbPressCount == 1, gamepad1.start);
             lift.liftRobot();
             telemetry.update();

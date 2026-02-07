@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.decode.national.hardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -7,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.decode.CycleGamepad;
+@Disabled
 @TeleOp (name = "AAAAAAAAAA 2")
 public class teleopRED2 extends LinearOpMode {
     transferintake_hardware transferAndIntake = new transferintake_hardware(this);

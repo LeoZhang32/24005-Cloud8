@@ -10,6 +10,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -23,17 +24,32 @@ public class encoders_hardware {
     com.qualcomm.hardware.gobilda.GoBildaPinpointDriver pinpoint;
     DcMotorEx turretEncoder;
     DcMotorEx shooterEncoder;
+    boolean resetted = false;
+    ElapsedTime resetTimer = new ElapsedTime();
     public void init (HardwareMap hwMap){
         pinpoint = hwMap.get(com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(136, 36,DistanceUnit.MM);
         pinpoint.setEncoderResolution(com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.EncoderDirection.FORWARD, com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.EncoderDirection.REVERSED);
         turretEncoder = hwMap.get(DcMotorEx.class,"BL");
-        turretEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooterEncoder = hwMap.get(DcMotorEx.class, "shooterTop");
     }
     public double getTurretPos(){
         return (double) turretEncoder.getCurrentPosition() /(8192*4) * 360;
+    }
+    public void resetTurretPos(boolean reset){
+        if (reset && !resetted) {
+            turretEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            turretEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            resetTimer.reset();
+            resetted = true;
+        }
+        else {
+        turretEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        if (resetTimer.seconds() >= 5){
+            resetted = false;
+        }
     }
     public double getShooterVel(){
         return shooterEncoder.getVelocity(AngleUnit.DEGREES);

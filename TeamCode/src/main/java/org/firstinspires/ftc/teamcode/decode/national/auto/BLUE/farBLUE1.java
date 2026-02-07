@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.decode.national.auto; // make sure this aligns with class location
+package org.firstinspires.ftc.teamcode.decode.national.auto.BLUE; // make sure this aligns with class location
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -27,13 +27,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.decode.national.hardware.color_sensor_hardware;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-import java.nio.file.Watchable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
 
-@Autonomous(name = "AAA FAR RED")
-public class farsoloRED1 extends CommandOpMode {
+@Autonomous(name = "AUTO FAR BLUE", group = "AAA BLUE")
+public class farBLUE1 extends CommandOpMode {
     private Follower follower;
 
     DcMotorEx shooterTop;
@@ -63,18 +62,20 @@ public class farsoloRED1 extends CommandOpMode {
     int greenIndex = 0;
     int purpleIndex = 0;
     boolean leaveActivated = false;
-    ArrayList<farsoloRED1.Flicker> flickOrder = new ArrayList<>();
+    ArrayList<farBLUE1.Flicker> flickOrder = new ArrayList<>();
     ArrayList<Flicker> purple = new ArrayList<>();
     ArrayList<Flicker> green = new ArrayList<>();
     color_sensor_hardware cSensors = new color_sensor_hardware();
-    private final Pose startPose = new Pose(81.25, 8.7, Math.toRadians(0));
-    private final Pose scorePose = new Pose (85.2, 16.7, Math.toRadians(0));
-    private final Pose intakeDiagonalPose = new Pose (129, 11, Math.toRadians(345));
-    private final Pose intakeHorizPose = new Pose (132, 10, Math.toRadians(0));
-    private final Pose intakePickup3 = new Pose (131, 35.4, Math.toRadians(0));
+    private final Pose startPose = new Pose(81.25, 8.7, Math.toRadians(0)).mirror();
+    private final Pose scorePose = new Pose (85.2, 16.7, Math.toRadians(0)).mirror();
+    private final Pose intakeDiagonalPose = new Pose (131, 12, Math.toRadians(340)).mirror();
+    private final Pose intakeHorizPose = new Pose (132, 10, Math.toRadians(0)).mirror();
+    private final Pose intakeHoriz2Pose = new Pose (128, 11, Math.toRadians(0)).mirror();
+    private final Pose intakePickup3 = new Pose (130.5, 35.4, Math.toRadians(0)).mirror();
+    private final Pose leavePose = new Pose (100, 16.78, Math.toRadians(0)).mirror();
 
 
-    private PathChain scorePreload, goIntakeDiag, continueIntakeHoriz, scoreIntaked, goIntake3, scorePickup3;
+    private PathChain scorePreload, goIntakeDiag, continueIntakeHoriz, scoreIntaked, goIntake3, scorePickup3, goIntakeHoriz2, scoreIntake2, leave;
     public void buildPaths() {
         scorePreload = follower.pathBuilder()
                 .addPath(new BezierLine(startPose,scorePose))
@@ -88,17 +89,31 @@ public class farsoloRED1 extends CommandOpMode {
                 .addPath(new BezierLine(intakeDiagonalPose,intakeHorizPose))
                 .setLinearHeadingInterpolation(intakeDiagonalPose.getHeading(),intakeHorizPose.getHeading())
                 .build();
+        goIntakeHoriz2 = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose,intakeHoriz2Pose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), intakeHoriz2Pose.getHeading())
+                .build();
+
         scoreIntaked = follower.pathBuilder()
                 .addPath(new BezierLine(intakeHorizPose, scorePose))
                 .setLinearHeadingInterpolation(intakeHorizPose.getHeading(),scorePose.getHeading())
                 .build();
+        scoreIntake2 = follower.pathBuilder()
+                .addPath(new BezierLine(intakeHoriz2Pose, scorePose))
+                .setLinearHeadingInterpolation(intakeHoriz2Pose.getHeading(),scorePose.getHeading())
+                .build();
+
         goIntake3 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, new Pose(100.9, 37.6), intakePickup3))
+                .addPath(new BezierCurve(scorePose, new Pose(100.9, 37.6).mirror(), intakePickup3))
                 .setLinearHeadingInterpolation(scorePose.getHeading(), intakePickup3.getHeading())
                 .build();
         scorePickup3 = follower.pathBuilder()
                 .addPath(new BezierLine(intakePickup3,scorePose))
                 .setLinearHeadingInterpolation(intakePickup3.getHeading(),scorePose.getHeading())
+                .build();
+        leave = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose, leavePose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), leavePose.getHeading())
                 .build();
     }
     private RunCommand spinShooter(double targetVel) {
@@ -436,6 +451,10 @@ public class farsoloRED1 extends CommandOpMode {
     private InstantCommand stopIntake() {
         return new InstantCommand(() -> intake.setPower(0));
     }
+
+    private InstantCommand reverseIntake(){
+        return new InstantCommand(()-> intake.setPower(-1));
+    }
     private RunCommand checkMotif(){
         return new RunCommand(() -> {
             LLResult llResult = limelight.getLatestResult();
@@ -506,22 +525,44 @@ public class farsoloRED1 extends CommandOpMode {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new ParallelCommandGroup(
-                                        moveTurret(-100).withTimeout(1000),
+                                        moveTurret(92).withTimeout(1000),
                                         checkMotif().withTimeout(1000)
                                 ),
-                                moveTurret(-67.5).interruptOn(()-> shootingFinished)
+                                moveTurret(64).interruptOn(()-> shootingFinished)
                         ),
                         new FollowPathCommand(follower, scorePreload),
                         spinShooter(185).interruptOn(() -> shootingFinished),
                         new SequentialCommandGroup(
                                 new WaitCommand(3000),
-                                scoreArtifacts(1.2, ()->tagID).interruptOn(() -> shootingFinished)
+                                scoreArtifacts(0.8, ()->tagID).interruptOn(() -> shootingFinished)
                         )
                 ),
                 resetFlickers(),
                 stopShooter(),
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
+                                new FollowPathCommand(follower, goIntakeDiag),
+                                spinIntake(),
+                                new WaitCommand(500),
+                                new FollowPathCommand(follower, continueIntakeHoriz),
+                                new WaitCommand(500),
+                                new ParallelCommandGroup(
+                                        new SequentialCommandGroup(
+                                                new WaitCommand(750),
+                                                reverseIntake()
+                                        ),
+                                        new FollowPathCommand(follower, scoreIntaked),
+                                        new SequentialCommandGroup(
+                                                new WaitCommand(250),
+                                                spinShooter(190).interruptOn(() -> shootingFinished)
+                                        ),
+                                        new SequentialCommandGroup(
+                                                new WaitCommand(1600),
+                                                scoreArtifacts(0.8, ()-> tagID).interruptOn(() -> shootingFinished)
+                                        )
+                                ),
+                                resetFlickers(),
+                                stopShooter(),
                                 new ParallelCommandGroup(
                                         new FollowPathCommand(follower, goIntake3),
                                         new SequentialCommandGroup(
@@ -531,42 +572,47 @@ public class farsoloRED1 extends CommandOpMode {
                                 ),
                                 new ParallelCommandGroup(
                                         new SequentialCommandGroup(
-                                                new WaitCommand(500),
-                                                stopIntake()
+                                                new WaitCommand(1250),
+                                                reverseIntake()
                                         ),
                                         new FollowPathCommand(follower, scorePickup3),
                                         new SequentialCommandGroup(
-                                                new WaitCommand(1000),
-                                                spinShooter(185).interruptOn(() -> shootingFinished)
+                                                new WaitCommand(750),
+                                                spinShooter(190).interruptOn(() -> shootingFinished)
                                         ),
                                         new SequentialCommandGroup(
-                                                new WaitCommand(2750),
-                                                scoreArtifacts(1.2, ()-> tagID).interruptOn(() -> shootingFinished)
+                                                new WaitCommand(2600),
+                                                scoreArtifacts(0.8, ()-> tagID).interruptOn(() -> shootingFinished)
                                         )
                                 ),
                                 resetFlickers(),
                                 stopShooter(),
-                                new FollowPathCommand(follower, goIntakeDiag),
-                                spinIntake(),
-                                new WaitCommand(500),
-                                new FollowPathCommand(follower, continueIntakeHoriz),
-                                new WaitCommand(1500),
-                                stopIntake(),
                                 new ParallelCommandGroup(
-                                        new FollowPathCommand(follower, scoreIntaked),
+                                        new FollowPathCommand(follower, goIntakeHoriz2),
+                                        spinIntake()
+                                ),
+                                new WaitCommand(1500),
+                                reverseIntake(),
+                                new ParallelCommandGroup(
+                                        new FollowPathCommand(follower, scoreIntake2),
                                         new SequentialCommandGroup(
-                                                new WaitCommand(750),
-                                                spinShooter(185).interruptOn(() -> shootingFinished)
+                                                new WaitCommand(500),
+                                                spinShooter(190).interruptOn(() -> shootingFinished)
                                         ),
                                         new SequentialCommandGroup(
-                                                new WaitCommand(2500),
-                                                scoreArtifacts(1.2, ()-> tagID).interruptOn(() -> shootingFinished)
+                                                new WaitCommand(2000),
+                                                scoreArtifacts(0.8, ()-> tagID).interruptOn(() -> shootingFinished)
                                         )
                                 ),
                                 resetFlickers(),
-                                stopShooter()
+                                stopShooter(),
+                                activateLeave()
                         ),
-                        moveTurret(-67.5).withTimeout(30000)
+                        moveTurret(64).interruptOn(()->leaveActivated)
+                ),
+                new ParallelCommandGroup(
+                        new FollowPathCommand(follower, leave),
+                        moveTurret(0).withTimeout(10000)
                 )
         );
         schedule(autonomousSequence);
