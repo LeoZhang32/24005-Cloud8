@@ -15,11 +15,11 @@ import org.firstinspires.ftc.teamcode.decode.national.hardware.shooter_hardware;
 import org.firstinspires.ftc.teamcode.decode.national.hardware.transferintake_hardware;
 
 @Config
-@TeleOp (name = "A TELEOP BLUE GPP", group = "AAA BLUE")
+@TeleOp (name = "A TELEOP BLUE GPP")
 public class teleopBLUE_GPP extends LinearOpMode {
     int motif = 1;
     shooter_hardware shooter = new shooter_hardware(this);
-    transferintake_hardware transferAndIntake = new transferintake_hardware(this);
+    transferintake_hardware transferAndIntake = new transferintake_hardware( this);
     encoders_hardware encoders = new encoders_hardware();
     dt_hardware dt = new dt_hardware();
     lift_hardware lift = new lift_hardware(this);
@@ -36,7 +36,7 @@ public class teleopBLUE_GPP extends LinearOpMode {
         while (!isStopRequested() && opModeIsActive()){
             cyclegamepad1.updateLB(2);
             cyclegamepad2.updateRB(2);
-            shooter.controlOuttake(gamepad1.start,cyclegamepad2.rbPressCount == 1,false, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.RADIANS,0));
+            shooter.controlOuttake(gamepad1.start,cyclegamepad2.rbPressCount == 1,false, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.RADIANS,0),0);
             transferAndIntake.sortTransferAndIntake(gamepad2.x || gamepad2.y, motif);
             dt.driveRobot(-gamepad1.left_stick_y, gamepad1.left_stick_x,gamepad1.right_stick_x * 0.7, cyclegamepad1.lbPressCount == 1, gamepad1.start);
             lift.liftRobot();

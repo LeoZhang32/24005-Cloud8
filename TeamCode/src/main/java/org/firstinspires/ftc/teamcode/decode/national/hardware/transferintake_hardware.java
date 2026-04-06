@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.decode.national.hardware;
 
+import static org.firstinspires.ftc.teamcode.decode.national.hardware.color_sensor_hardware.DetectedColor.GREEN;
+import static org.firstinspires.ftc.teamcode.decode.national.hardware.color_sensor_hardware.DetectedColor.PURPLE;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -173,19 +176,19 @@ public class transferintake_hardware {
 
         if (!manualMode) {
             color_sensor_hardware.DetectedColor[] motifGPP = {
-                    color_sensor_hardware.DetectedColor.GREEN,
-                    color_sensor_hardware.DetectedColor.PURPLE,
-                    color_sensor_hardware.DetectedColor.PURPLE
+                    GREEN,
+                    PURPLE,
+                    PURPLE
             };
             color_sensor_hardware.DetectedColor[] motifPGP = {
-                    color_sensor_hardware.DetectedColor.PURPLE,
-                    color_sensor_hardware.DetectedColor.GREEN,
-                    color_sensor_hardware.DetectedColor.PURPLE
+                    PURPLE,
+                    GREEN,
+                    PURPLE
             };
             color_sensor_hardware.DetectedColor[] motifPPG = {
-                    color_sensor_hardware.DetectedColor.PURPLE,
-                    color_sensor_hardware.DetectedColor.PURPLE,
-                    color_sensor_hardware.DetectedColor.GREEN
+                    PURPLE,
+                    PURPLE,
+                    GREEN
             };
 
             if (myOpMode.gamepad2.a) {
@@ -199,12 +202,12 @@ public class transferintake_hardware {
                 if (!capacityChecked) {
                     purple.clear();
                     green.clear();
-                    if (color1 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f1);
-                    if (color1 == color_sensor_hardware.DetectedColor.GREEN) green.add(f1);
-                    if (color2 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f2);
-                    if (color2 == color_sensor_hardware.DetectedColor.GREEN) green.add(f2);
-                    if (color3 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f3);
-                    if (color3 == color_sensor_hardware.DetectedColor.GREEN) green.add(f3);
+                    if (color1 == PURPLE) purple.add(f1);
+                    if (color1 == GREEN) green.add(f1);
+                    if (color2 == PURPLE) purple.add(f2);
+                    if (color2 == GREEN) green.add(f2);
+                    if (color3 == PURPLE) purple.add(f3);
+                    if (color3 == GREEN) green.add(f3);
                     patternIndex = 0;
                     greenIndex = 0;
                     purpleIndex = 0;
@@ -220,17 +223,17 @@ public class transferintake_hardware {
                         Flicker current = null;
 
                         // primary
-                        if (wanted == color_sensor_hardware.DetectedColor.GREEN && greenIndex < green.size()) {
+                        if (wanted == GREEN && greenIndex < green.size()) {
                             current = green.get(greenIndex);
                         }
-                        else if (wanted == color_sensor_hardware.DetectedColor.PURPLE && purpleIndex < purple.size()) {
+                        else if (wanted == PURPLE && purpleIndex < purple.size()) {
                             current = purple.get(purpleIndex);
                         }
                         // fallback
-                        else if (wanted == color_sensor_hardware.DetectedColor.GREEN && purpleIndex < purple.size()) {
+                        else if (wanted == GREEN && purpleIndex < purple.size()) {
                             current = purple.get(purpleIndex);
                         }
-                        else if (wanted == color_sensor_hardware.DetectedColor.PURPLE && greenIndex < green.size()) {
+                        else if (wanted == PURPLE && greenIndex < green.size()) {
                             current = green.get(greenIndex);
                         }
                         // nothing left
@@ -277,17 +280,17 @@ public class transferintake_hardware {
                         Flicker current = null;
 
                         // primary
-                        if (wanted == color_sensor_hardware.DetectedColor.GREEN && greenIndex < green.size()) {
+                        if (wanted == GREEN && greenIndex < green.size()) {
                             current = green.get(greenIndex);
                         }
-                        else if (wanted == color_sensor_hardware.DetectedColor.PURPLE && purpleIndex < purple.size()) {
+                        else if (wanted == PURPLE && purpleIndex < purple.size()) {
                             current = purple.get(purpleIndex);
                         }
                         // fallback
-                        else if (wanted == color_sensor_hardware.DetectedColor.GREEN && purpleIndex < purple.size()) {
+                        else if (wanted == GREEN && purpleIndex < purple.size()) {
                             current = purple.get(purpleIndex);
                         }
-                        else if (wanted == color_sensor_hardware.DetectedColor.PURPLE && greenIndex < green.size()) {
+                        else if (wanted == PURPLE && greenIndex < green.size()) {
                             current = green.get(greenIndex);
                         }
                         // nothing left
@@ -333,17 +336,17 @@ public class transferintake_hardware {
                         Flicker current = null;
 
                         // primary
-                        if (wanted == color_sensor_hardware.DetectedColor.GREEN && greenIndex < green.size()) {
+                        if (wanted == GREEN && greenIndex < green.size()) {
                             current = green.get(greenIndex);
                         }
-                        else if (wanted == color_sensor_hardware.DetectedColor.PURPLE && purpleIndex < purple.size()) {
+                        else if (wanted == PURPLE && purpleIndex < purple.size()) {
                             current = purple.get(purpleIndex);
                         }
                         // fallback
-                        else if (wanted == color_sensor_hardware.DetectedColor.GREEN && purpleIndex < purple.size()) {
+                        else if (wanted == GREEN && purpleIndex < purple.size()) {
                             current = purple.get(purpleIndex);
                         }
-                        else if (wanted == color_sensor_hardware.DetectedColor.PURPLE && greenIndex < green.size()) {
+                        else if (wanted == PURPLE && greenIndex < green.size()) {
                             current = green.get(greenIndex);
                         }
                         // nothing left
@@ -398,18 +401,18 @@ public class transferintake_hardware {
             boolean yPressed = y && !lastY;
 
             // build lists ONCE
-            if ((xPressed || yPressed) && !capacityChecked) {
+            if ((xPressed || yPressed) && (!capacityChecked || shootingFinished)) {
                 purple.clear();
                 green.clear();
 
-                if (color1 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f1);
-                if (color1 == color_sensor_hardware.DetectedColor.GREEN)  green.add(f1);
+                if (color1 == PURPLE) purple.add(f1);
+                if (color1 == GREEN)  green.add(f1);
 
-                if (color2 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f2);
-                if (color2 == color_sensor_hardware.DetectedColor.GREEN)  green.add(f2);
+                if (color2 == PURPLE) purple.add(f2);
+                if (color2 == GREEN)  green.add(f2);
 
-                if (color3 == color_sensor_hardware.DetectedColor.PURPLE) purple.add(f3);
-                if (color3 == color_sensor_hardware.DetectedColor.GREEN)  green.add(f3);
+                if (color3 == PURPLE) purple.add(f3);
+                if (color3 == GREEN)  green.add(f3);
 
                 purpleIndex = 0;
                 greenIndex = 0;
@@ -446,7 +449,7 @@ public class transferintake_hardware {
             }
 
             // done condition
-            if (purpleIndex >= purple.size() && greenIndex >= green.size()) {
+            if (capacityChecked && purpleIndex >= purple.size() && greenIndex >= green.size()){
                 shootingFinished = true;
                 capacityChecked = false;
             }
@@ -462,12 +465,12 @@ public class transferintake_hardware {
             intake.setPower(-1);
         } else intake.setPower(0);
 
-        if (color1 == color_sensor_hardware.DetectedColor.PURPLE) light1.setPosition(0.722);
-        if (color2 == color_sensor_hardware.DetectedColor.PURPLE) light2.setPosition(0.722);
-        if (color3 == color_sensor_hardware.DetectedColor.PURPLE) light3.setPosition(0.722);
-        if (color1 == color_sensor_hardware.DetectedColor.GREEN) light1.setPosition(0.5);
-        if (color2 == color_sensor_hardware.DetectedColor.GREEN) light2.setPosition(0.5);
-        if (color3 == color_sensor_hardware.DetectedColor.GREEN) light3.setPosition(0.5);
+        if (color1 == PURPLE) light1.setPosition(0.722);
+        if (color2 == PURPLE) light2.setPosition(0.722);
+        if (color3 == PURPLE) light3.setPosition(0.722);
+        if (color1 == GREEN) light1.setPosition(0.5);
+        if (color2 == GREEN) light2.setPosition(0.5);
+        if (color3 == GREEN) light3.setPosition(0.5);
         if (color1 == color_sensor_hardware.DetectedColor.UNKNOWN) light1.setPosition(0);
         if (color2 == color_sensor_hardware.DetectedColor.UNKNOWN) light2.setPosition(0);
         if (color3 == color_sensor_hardware.DetectedColor.UNKNOWN) light3.setPosition(0);

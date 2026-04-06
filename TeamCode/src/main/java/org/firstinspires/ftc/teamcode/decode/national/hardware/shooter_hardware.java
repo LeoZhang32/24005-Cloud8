@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.decode.national.hardware;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS;
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -39,6 +42,7 @@ public class shooter_hardware {
     encoders_hardware encoders = new encoders_hardware();
 
     public void init(HardwareMap hwMap, int pipeline){
+        manualOffset = 0;
         shooterTop = hwMap.get(DcMotorEx.class, "shooterTop");
         shooterTop.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         shooterBottom = hwMap.get(DcMotorEx.class, "shooterBottom");
@@ -57,36 +61,42 @@ public class shooter_hardware {
 
         return (error * Kp) + (reference * Kf);
     }
-    public void controlOuttake(boolean reset, boolean shooterInput, boolean isRed, Pose2D initPose) {
-        encoders.resetTurretPos(myOpMode.gamepad2.start);
+    public void controlOuttake(boolean reset, boolean shooterInput, boolean isRed, Pose2D initPose, double turretInitPose) {
+//        encoders.resetTurretPos(myOpMode.gamepad2.start);
         if (myOpMode.gamepad2.start) manualOffset = 0;
+        //Using RR here, because I just need somewhere to store the coordinates of the goals.
         Vector2d goal;
         if (isRed) {
             limelight.pipelineSwitch(0);
-            goal = new Vector2d(-68,72);
+            goal = new Vector2d(-72,72);
         }
         else {
             limelight.pipelineSwitch(2);
-            goal = new Vector2d(68,72);
+            goal = new Vector2d(-72,-72);
         }
-
+        myOpMode.telemetry.addData("goal x", goal.x);
+        myOpMode.telemetry.addData("goal y", goal.y);
 
         LLResult llResult = limelight.getLatestResult();
-        Pose2d pos = encoders.getPinpointPos(reset, initPose);
+        Pose2D pos = encoders.getPinpointPos(reset, initPose);
+        myOpMode.telemetry.addData("FTC x", pos.getX(INCH));
+        myOpMode.telemetry.addData("FTC y", pos.getY(INCH));
+        myOpMode.telemetry.addData("FTC Heading", pos.getHeading(RADIANS));
 
-        double dx = Math.abs(goal.x - pos.position.x);
-        double dy = Math.abs(goal.y - pos.position.y);
+        double dx = Math.abs(goal.x - pos.getX(INCH));
+        double dy = Math.abs(goal.y - pos.getY(INCH));
         double robotGoalAngle = 0;
         if (Math.abs(dx) > 1e-6 || Math.abs(dy) > 1e-6) {
-            robotGoalAngle = Math.toDegrees(Math.atan(dx/dy));
+            robotGoalAngle = Math.toDegrees(Math.atan(dy/dx));
         }
 
         if (myOpMode.gamepad2.dpad_right) manualOffset += 1;
         if (myOpMode.gamepad2.dpad_left) manualOffset -= 1;
 
 
-        if (isRed) desiredAngle = 0 - robotGoalAngle + Math.toDegrees(pos.heading.toDouble()) + manualOffset;
-        else desiredAngle = 0 + robotGoalAngle + Math.toDegrees(pos.heading.toDouble()) + manualOffset;
+        //pos.heading is negative right, positive left; robotGoalAngle is positive always.
+        if (isRed) desiredAngle = Math.toDegrees(pos.getHeading(RADIANS)) - (180-robotGoalAngle) + manualOffset - turretInitPose;
+        else desiredAngle = Math.toDegrees(pos.getHeading(RADIANS)) + (180-robotGoalAngle) + manualOffset - turretInitPose;
         if (desiredAngle < -135) {
             desiredAngle += 360;
         }
@@ -95,26 +105,28 @@ public class shooter_hardware {
         }
 
         desiredAngle = Range.clip(desiredAngle,-135,130);
+//        desiredAngle = -36;
 
-
-        double distance = Math.sqrt(Math.pow((pos.position.x-goal.x),2) + Math.pow((pos.position.y-goal.y),2));
+        double distance = Math.sqrt(Math.pow((pos.getX(INCH)-goal.x),2) + Math.pow((pos.getY(INCH)-goal.y),2));
         myOpMode.telemetry.addData("distance", distance);
         myOpMode.telemetry.addData("robotgoalangle", robotGoalAngle);
 
         if (distance > 0 && distance < 60) hoodPos = 0.9;
         if (distance >= 60 && distance < 120) hoodPos = 0.6;
         if (distance >= 120) hoodPos = 0.5;
+//        hoodPos = 0.45;
 
         hood.setPosition(hoodPos);
 
-        double targetVel = 0;
+//        double targetVel = 140;
         double shooterPower = 0;
         if (distance < 120) targetVel = 0.82185 * distance + 86.39032;
         else targetVel = 0.641044*distance + 107.1447;
         shooterPower = PIDControlShooter(targetVel, encoders.getShooterVel(), 0.0325,0.00325);
         double turretPower = 0;
 
-        desiredXOffset = -0.1893*robotGoalAngle + 9.6214;
+        if (isRed) desiredXOffset = -0.1893*robotGoalAngle + 9.6214;
+        else desiredXOffset = -(-0.1893*robotGoalAngle + 9.6214);
 
         if (shooterInput){
             shooterTop.setPower(shooterPower);
@@ -147,6 +159,7 @@ public class shooter_hardware {
             shooterTop.setPower(0);
             shooterBottom.setPower(0);
         }
+        myOpMode.telemetry.addData("turretPos", encoders.getTurretPos());
         if (Double.isNaN(turretPower)) turret.setPower(0);
         else turret.setPower(turretPower);
         myOpMode.telemetry.addData("timer", timer.seconds());

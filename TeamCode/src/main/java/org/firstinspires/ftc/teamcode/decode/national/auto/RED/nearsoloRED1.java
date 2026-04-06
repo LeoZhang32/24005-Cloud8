@@ -65,8 +65,9 @@ public class nearsoloRED1 extends CommandOpMode {
     ArrayList<Flicker> purple = new ArrayList<>();
     ArrayList<Flicker> green = new ArrayList<>();
     color_sensor_hardware cSensors = new color_sensor_hardware();
-    private final Pose startPose = new Pose(81.25, 134.5, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(90));// Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+
+    private final Pose startPose = new Pose(119.6, 127.8, Math.toRadians(36.5)); // Start Pose of our robot.
+    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(36.5));// Scoring Pose of our robot.
     private final Pose scorePose = new Pose (94,104,Math.toRadians(0));
     private final Pose go1Pose = new Pose(93, 86, Math.toRadians(0));
     private final Pose pickup1Pose = new Pose(120, 77, Math.toRadians(0));
@@ -550,10 +551,10 @@ public class nearsoloRED1 extends CommandOpMode {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new ParallelCommandGroup(
-                                        moveTurret(-10).withTimeout(1000),
-                                        checkMotif().withTimeout(1000)
+                                        moveTurret(-90).withTimeout(1500),
+                                        checkMotif().withTimeout(1500)
                                 ),
-                                moveTurret(51).interruptOn(()-> shootingFinished)
+                                moveTurret(0).interruptOn(()-> shootingFinished)
                         ),
                         new FollowPathCommand(follower, scorePreload),
                         spinShooter(135).interruptOn(() -> shootingFinished),

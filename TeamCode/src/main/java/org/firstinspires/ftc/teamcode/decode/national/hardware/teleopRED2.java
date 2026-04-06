@@ -27,7 +27,7 @@ public class teleopRED2 extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             cyclegamepad1.updateLB(2);
             cyclegamepad2.updateRB(2);
-            shooter.controlOuttake(gamepad1.start,cyclegamepad2.rbPressCount == 1,true, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.RADIANS,0));
+            shooter.controlOuttake(gamepad1.start,cyclegamepad2.rbPressCount == 1,true, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.RADIANS,0),0);
             transferAndIntake.sortTransferAndIntake(false,1);
             telemetry.update();
         }

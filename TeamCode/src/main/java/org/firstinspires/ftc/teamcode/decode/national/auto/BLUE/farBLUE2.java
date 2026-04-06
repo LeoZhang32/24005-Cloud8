@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
 
-@Autonomous(name = "AAA NEAR BLUE 2", group = "AAA BLUE")
-public class nearBLUE2 extends CommandOpMode {
+@Autonomous(name = "AUTO FAR BLUE 2", group = "AAA BLUE")
+public class farBLUE2 extends CommandOpMode {
     private Follower follower;
 
     DcMotorEx shooterTop;
@@ -62,97 +62,59 @@ public class nearBLUE2 extends CommandOpMode {
     int greenIndex = 0;
     int purpleIndex = 0;
     boolean leaveActivated = false;
-    ArrayList<Flicker> flickOrder = new ArrayList<>();
+    ArrayList<farBLUE2.Flicker> flickOrder = new ArrayList<>();
     ArrayList<Flicker> purple = new ArrayList<>();
     ArrayList<Flicker> green = new ArrayList<>();
     color_sensor_hardware cSensors = new color_sensor_hardware();
+    private final Pose startPose = new Pose(81.25, 8.7, Math.toRadians(0)).mirror();
+    private final Pose scorePose = new Pose (85.2, 16.7, Math.toRadians(0)).mirror();
+    private final Pose intakeDiagonalPose = new Pose (131, 12, Math.toRadians(340)).mirror();
+    private final Pose intakeHorizPose = new Pose (132, 10, Math.toRadians(0)).mirror();
+    private final Pose intakeHoriz2Pose = new Pose (128, 11, Math.toRadians(0)).mirror();
+    private final Pose intakePickup3 = new Pose (130.5, 35.4, Math.toRadians(0)).mirror();
+    private final Pose leavePose = new Pose (100, 16.78, Math.toRadians(0)).mirror();
 
-    private final Pose startPose = new Pose(118.2, 130, Math.toRadians(36.5)).mirror(); // Start Pose of our robot.
-    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(36.5)).mirror();// Scoring Pose of our robot.
-    private final Pose scorePose = new Pose (94,104,Math.toRadians(0)).mirror();
-    private final Pose go1Pose = new Pose(93, 90, Math.toRadians(0)).mirror();
-    private final Pose pickup1Pose = new Pose(123, 87, Math.toRadians(0)).mirror();
-    private final Pose gatePose = new Pose(123.5 , 78.5, Math.toRadians(0)).mirror();
-    private final Pose go2Pose = new Pose(93, 61, Math.toRadians(0)).mirror();
-    private final Pose pickup2Pose = new Pose(131, 61, Math.toRadians(0)).mirror();
-    private final Pose exit2Pose = new Pose (110, 61, Math.toRadians(0)).mirror();
-    private final Pose go3Pose = new Pose(93, 38.8, Math.toRadians(0)).mirror();
-    private final Pose pickup3Pose = new Pose(131, 38.8, Math.toRadians(0)).mirror();
-    private final Pose score3Pose = new Pose(83,112,Math.toRadians(0)).mirror();
-    private final Pose leavePose = new Pose (113, 72, Math.toRadians(0)).mirror();
-    private PathChain scorePreload, gotoPickup1, grabPickup1, gotoPickup2, grabPickup2, gotoPickup3, grabPickup3, scorePickup1, scorePickup2, scorePickup3, leave, openGate1, openGate2;
 
+    private PathChain scorePreload, goIntakeDiag, continueIntakeHoriz, scoreIntaked, goIntake3, scorePickup3, goIntakeHoriz2, scoreIntake2, leave;
     public void buildPaths() {
-        /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, scorePreloadPose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), scorePreloadPose.getHeading())
+                .addPath(new BezierLine(startPose,scorePose))
+                .setLinearHeadingInterpolation(startPose.getHeading(),scorePose.getHeading())
                 .build();
-    /* Here is an example for Constant Interpolation
-    scorePreload.setConstantInterpolation(startPose.getHeading()); */
-
-        /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        gotoPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePreloadPose, go1Pose))
-                .setLinearHeadingInterpolation(scorePreloadPose.getHeading(), go1Pose.getHeading())
+        goIntakeDiag = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose,intakeDiagonalPose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(),intakeDiagonalPose.getHeading())
                 .build();
-
-        /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(go1Pose, pickup1Pose))
-                .setLinearHeadingInterpolation(go1Pose.getHeading(), pickup1Pose.getHeading())
+        continueIntakeHoriz = follower.pathBuilder()
+                .addPath(new BezierLine(intakeDiagonalPose,intakeHorizPose))
+                .setLinearHeadingInterpolation(intakeDiagonalPose.getHeading(),intakeHorizPose.getHeading())
                 .build();
-        openGate1 = follower.pathBuilder()
-                .addPath(new BezierCurve(pickup1Pose, new Pose (106.5,76).mirror(), gatePose))
-                .setLinearHeadingInterpolation(pickup1Pose.getHeading(),gatePose.getHeading())
-                .build();
-        scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
+        goIntakeHoriz2 = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose,intakeHoriz2Pose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), intakeHoriz2Pose.getHeading())
                 .build();
 
-        gotoPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, go2Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), go2Pose.getHeading())
+        scoreIntaked = follower.pathBuilder()
+                .addPath(new BezierLine(intakeHorizPose, scorePose))
+                .setLinearHeadingInterpolation(intakeHorizPose.getHeading(),scorePose.getHeading())
+                .build();
+        scoreIntake2 = follower.pathBuilder()
+                .addPath(new BezierLine(intakeHoriz2Pose, scorePose))
+                .setLinearHeadingInterpolation(intakeHoriz2Pose.getHeading(),scorePose.getHeading())
                 .build();
 
-        grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(go2Pose, pickup2Pose))
-                .setLinearHeadingInterpolation(go2Pose.getHeading(), pickup2Pose.getHeading())
-                .build();
-        openGate2 = follower.pathBuilder()
-                .addPath(new BezierCurve(pickup2Pose, new Pose(115, 57.5).mirror(), new Pose(115.5, 76).mirror(), gatePose))
-                .setLinearHeadingInterpolation(pickup2Pose.getHeading(),gatePose.getHeading())
-                .build();
-
-//        exit2 = follower.pathBuilder()
-//                .addPath(new BezierLine(pickup2Pose, exit2Pose))
-//                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), exit2Pose.getHeading())
-//                .build();
-
-        scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(exit2Pose, scorePose))
-                .setLinearHeadingInterpolation(exit2Pose.getHeading(), scorePose.getHeading())
-                .build();
-
-        gotoPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, go3Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), go3Pose.getHeading())
-                .build();
-
-        grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(go3Pose, pickup3Pose))
-                .setLinearHeadingInterpolation(go3Pose.getHeading(), pickup3Pose.getHeading())
+        goIntake3 = follower.pathBuilder()
+                .addPath(new BezierCurve(scorePose, new Pose(100.9, 37.6).mirror(), intakePickup3))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), intakePickup3.getHeading())
                 .build();
         scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3Pose, score3Pose))
-                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), score3Pose.getHeading())
+                .addPath(new BezierLine(intakePickup3,scorePose))
+                .setLinearHeadingInterpolation(intakePickup3.getHeading(),scorePose.getHeading())
                 .build();
         leave = follower.pathBuilder()
-                .addPath(new BezierLine(score3Pose, leavePose))
-                .setLinearHeadingInterpolation(score3Pose.getHeading(),leavePose.getHeading())
+                .addPath(new BezierLine(scorePose, leavePose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), leavePose.getHeading())
                 .build();
-
     }
     private RunCommand spinShooter(double targetVel) {
         return new RunCommand(() -> {
@@ -486,11 +448,12 @@ public class nearBLUE2 extends CommandOpMode {
             else intake.setPower(1);
         });
     }
-    private InstantCommand reverseIntake(){
-        return new InstantCommand(()-> intake.setPower(-1));
-    }
     private InstantCommand stopIntake() {
         return new InstantCommand(() -> intake.setPower(0));
+    }
+
+    private InstantCommand reverseIntake(){
+        return new InstantCommand(()-> intake.setPower(-1));
     }
     private RunCommand checkMotif(){
         return new RunCommand(() -> {
@@ -558,105 +521,92 @@ public class nearBLUE2 extends CommandOpMode {
         follower.setStartingPose(startPose);
 
         SequentialCommandGroup autonomousSequence = new SequentialCommandGroup(
-                moveHood(0.45),
+                moveHood(0.4),
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new ParallelCommandGroup(
-                                        moveTurret(80).withTimeout(1500),
-                                        checkMotif().withTimeout(1500)
+                                        moveTurret(92).withTimeout(1000),
+                                        checkMotif().withTimeout(1000)
                                 ),
-                                moveTurret(0).interruptOn(()-> shootingFinished)
+                                moveTurret(64).interruptOn(()-> shootingFinished)
                         ),
                         new FollowPathCommand(follower, scorePreload),
-                        spinShooter(140).interruptOn(() -> shootingFinished),
+                        spinShooter(185).interruptOn(() -> shootingFinished),
                         new SequentialCommandGroup(
-                                new WaitCommand(2250),
-                                scoreArtifacts(0.5, ()->tagID).interruptOn(() -> shootingFinished)
+                                new WaitCommand(3000),
+                                scoreArtifacts(0.8, ()->tagID).interruptOn(() -> shootingFinished)
                         )
                 ),
                 resetFlickers(),
                 stopShooter(),
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
-                                new FollowPathCommand(follower, gotoPickup1),
+                                new FollowPathCommand(follower, goIntakeDiag),
                                 spinIntake(),
-                                new FollowPathCommand(follower, grabPickup1).setGlobalMaxPower(0.1),
-                                new WaitCommand(750),
-                                stopIntake(),
-                                new FollowPathCommand(follower, openGate1).setGlobalMaxPower(0.1),
-                                new WaitCommand(1000),
+                                new WaitCommand(500),
+                                new FollowPathCommand(follower, continueIntakeHoriz),
+                                new WaitCommand(500),
                                 new ParallelCommandGroup(
-                                        new FollowPathCommand(follower, scorePickup1).setGlobalMaxPower(1),
                                         new SequentialCommandGroup(
-                                                reverseIntake(),
                                                 new WaitCommand(750),
-                                                stopIntake()
+                                                reverseIntake()
+                                        ),
+                                        new FollowPathCommand(follower, scoreIntaked),
+                                        new SequentialCommandGroup(
+                                                new WaitCommand(250),
+                                                spinShooter(190).interruptOn(() -> shootingFinished)
                                         ),
                                         new SequentialCommandGroup(
-                                                new WaitCommand(500),
-                                                spinShooter(140).interruptOn(() -> shootingFinished)
-                                        ),
-                                        new SequentialCommandGroup(
-                                                new WaitCommand(1500),
-                                                scoreArtifacts(0.5, ()-> tagID).interruptOn(() -> shootingFinished)
+                                                new WaitCommand(1600),
+                                                scoreArtifacts(0.8, ()-> tagID).interruptOn(() -> shootingFinished)
                                         )
                                 ),
                                 resetFlickers(),
                                 stopShooter(),
-                                new FollowPathCommand(follower, gotoPickup2),
-                                spinIntake(),
-                                new FollowPathCommand(follower, grabPickup2).setGlobalMaxPower(0.3),
-                                new WaitCommand(750),
-                                stopIntake(),
-                                new FollowPathCommand(follower, openGate2).setGlobalMaxPower(1),
-                                new WaitCommand(1000),
                                 new ParallelCommandGroup(
-                                        new FollowPathCommand(follower, scorePickup2).setGlobalMaxPower(1),
-                                        new SequentialCommandGroup(
-                                                reverseIntake(),
-                                                new WaitCommand(750),
-                                                stopIntake()
-                                        ),
+                                        new FollowPathCommand(follower, goIntakeHoriz2),
+                                        spinIntake()
+                                ),
+                                new WaitCommand(1500),
+                                reverseIntake(),
+                                new ParallelCommandGroup(
+                                        new FollowPathCommand(follower, scoreIntake2),
                                         new SequentialCommandGroup(
                                                 new WaitCommand(500),
-                                                spinShooter(140).interruptOn(() -> shootingFinished)
+                                                spinShooter(190).interruptOn(() -> shootingFinished)
                                         ),
                                         new SequentialCommandGroup(
-                                                new WaitCommand(1750),
-                                                scoreArtifacts(0.5, ()-> tagID).interruptOn(() -> shootingFinished)
+                                                new WaitCommand(2000),
+                                                scoreArtifacts(0.8, ()-> tagID).interruptOn(() -> shootingFinished)
                                         )
                                 ),
                                 resetFlickers(),
                                 stopShooter(),
-                                new FollowPathCommand(follower, gotoPickup3),
-                                spinIntake(),
-                                new FollowPathCommand(follower, grabPickup3).setGlobalMaxPower(0.3),
-                                new WaitCommand(750),
-                                stopIntake(),
+                                new ParallelCommandGroup(
+                                        new FollowPathCommand(follower, goIntakeHoriz2),
+                                        spinIntake()
+                                ),
+                                new WaitCommand(1500),
+                                reverseIntake(),
+                                new ParallelCommandGroup(
+                                        new FollowPathCommand(follower, scoreIntake2),
+                                        new SequentialCommandGroup(
+                                                new WaitCommand(500),
+                                                spinShooter(190).interruptOn(() -> shootingFinished)
+                                        ),
+                                        new SequentialCommandGroup(
+                                                new WaitCommand(2000),
+                                                scoreArtifacts(0.8, ()-> tagID).interruptOn(() -> shootingFinished)
+                                        )
+                                ),
+                                resetFlickers(),
+                                stopShooter(),
                                 activateLeave()
                         ),
-                        moveTurret(36).interruptOn(()-> leaveActivated)
+                        moveTurret(64).interruptOn(()->leaveActivated)
                 ),
                 new ParallelCommandGroup(
-                        moveTurret(20.7).interruptOn(()->shootingFinished),
-                        new FollowPathCommand(follower, scorePickup3).setGlobalMaxPower(1),
-                        new SequentialCommandGroup(
-                                reverseIntake(),
-                                new WaitCommand(750),
-                                stopIntake()
-                        ),
-                        new SequentialCommandGroup(
-                                new WaitCommand(1500),
-                                spinShooter(140).interruptOn(() -> shootingFinished)
-                        ),
-                        new SequentialCommandGroup(
-                                new WaitCommand(2750),
-                                scoreArtifacts(0.4, ()-> tagID).interruptOn(() -> shootingFinished)
-                        )
-                ),
-                resetFlickers(),
-                stopShooter(),
-                new ParallelCommandGroup(
+                        new FollowPathCommand(follower, leave),
                         moveTurret(0).withTimeout(10000)
                 )
         );

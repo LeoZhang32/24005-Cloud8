@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.decode.national.auto.RED; // make sure this aligns with class location
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -66,8 +69,8 @@ public class nearRED2 extends CommandOpMode {
     ArrayList<Flicker> purple = new ArrayList<>();
     ArrayList<Flicker> green = new ArrayList<>();
     color_sensor_hardware cSensors = new color_sensor_hardware();
-    private final Pose startPose = new Pose(81.25, 134.5, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(90));// Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose startPose = new Pose(118.2, 130, Math.toRadians(36.5)); // Start Pose of our robot.
+    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(36.5));// Scoring Pose of our robot.
     private final Pose scorePose = new Pose (94,104,Math.toRadians(0));
     private final Pose go1Pose = new Pose(93, 90, Math.toRadians(0));
     private final Pose pickup1Pose = new Pose(123, 87, Math.toRadians(0));
@@ -561,15 +564,15 @@ public class nearRED2 extends CommandOpMode {
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
                                 new ParallelCommandGroup(
-                                        moveTurret(-10).withTimeout(1000),
-                                        checkMotif().withTimeout(1000)
+                                        moveTurret(-90).withTimeout(1500),
+                                        checkMotif().withTimeout(1500)
                                 ),
-                                moveTurret(51).interruptOn(()-> shootingFinished)
+                                moveTurret(0).interruptOn(()-> shootingFinished)
                         ),
                         new FollowPathCommand(follower, scorePreload),
-                        spinShooter(135).interruptOn(() -> shootingFinished),
+                        spinShooter(140).interruptOn(() -> shootingFinished),
                         new SequentialCommandGroup(
-                                new WaitCommand(1500),
+                                new WaitCommand(2250),
                                 scoreArtifacts(0.5, ()->tagID).interruptOn(() -> shootingFinished)
                         )
                 ),
@@ -593,7 +596,7 @@ public class nearRED2 extends CommandOpMode {
                                         ),
                                         new SequentialCommandGroup(
                                                 new WaitCommand(500),
-                                                spinShooter(135).interruptOn(() -> shootingFinished)
+                                                spinShooter(140).interruptOn(() -> shootingFinished)
                                         ),
                                         new SequentialCommandGroup(
                                                 new WaitCommand(1500),
@@ -618,7 +621,7 @@ public class nearRED2 extends CommandOpMode {
                                         ),
                                         new SequentialCommandGroup(
                                                 new WaitCommand(500),
-                                                spinShooter(135).interruptOn(() -> shootingFinished)
+                                                spinShooter(140).interruptOn(() -> shootingFinished)
                                         ),
                                         new SequentialCommandGroup(
                                                 new WaitCommand(1750),
@@ -646,7 +649,7 @@ public class nearRED2 extends CommandOpMode {
                         ),
                         new SequentialCommandGroup(
                                 new WaitCommand(1500),
-                                spinShooter(135).interruptOn(() -> shootingFinished)
+                                spinShooter(140).interruptOn(() -> shootingFinished)
                         ),
                         new SequentialCommandGroup(
                                 new WaitCommand(2750),
@@ -666,6 +669,18 @@ public class nearRED2 extends CommandOpMode {
     public void run() {
         follower.update();
         super.run();
+        SharedPreferences prefs = hardwareMap.appContext.getSharedPreferences("RobotPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putFloat("x", (float) follower.getPose().getX());
+        editor.putFloat("y", (float) follower.getPose().getY());
+        editor.putFloat("heading", (float) follower.getPose().getHeading());
+        double turretDegrees =  (turretEncoder.getCurrentPosition() * 360.0) / (4.0 * 8192.0);
+        editor.putFloat("turretPos", (float) turretDegrees);
+
+        editor.apply();
+        double test = prefs.getFloat("turretPos", -999);
+        telemetry.addData("Read after save", test);
         telemetry.addData("green size", green.size());
         telemetry.addData("purple size", purple.size());
         telemetry.addData("shooterVel", shooterTop.getVelocity(AngleUnit.DEGREES));

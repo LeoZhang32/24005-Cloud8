@@ -65,8 +65,8 @@ public class nearsoloBLUE1 extends CommandOpMode {
     ArrayList<Flicker> purple = new ArrayList<>();
     ArrayList<Flicker> green = new ArrayList<>();
     color_sensor_hardware cSensors = new color_sensor_hardware();
-    private final Pose startPose = new Pose(81.25, 134.5, Math.toRadians(90)).mirror(); // Start Pose of our robot.
-    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(90)).mirror();// Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    private final Pose startPose = new Pose(118, 130, Math.toRadians(36.5)).mirror(); // Start Pose of our robot.
+    private final Pose scorePreloadPose = new Pose(94, 104, Math.toRadians(36.5)).mirror();// Scoring Pose of our robot.
     private final Pose scorePose = new Pose (94,104,Math.toRadians(0)).mirror();
     private final Pose go1Pose = new Pose(93, 86, Math.toRadians(0)).mirror();
     private final Pose pickup1Pose = new Pose(120, 77, Math.toRadians(0)).mirror();
